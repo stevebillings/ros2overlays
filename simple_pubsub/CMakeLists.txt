@@ -15,14 +15,14 @@ set(dependencies
 	std_msgs
 )
 
-add_executable(sbPublisher src/sbPublisher.cpp)
-add_executable(sbSubscriber src/sbSubscriber.cpp)
-ament_target_dependencies(sbPublisher ${dependencies})
-ament_target_dependencies(sbSubscriber ${dependencies})
+add_executable(publisher src/publisher.cpp)
+add_executable(subscriber src/subscriber.cpp)
+ament_target_dependencies(publisher ${dependencies})
+ament_target_dependencies(subscriber ${dependencies})
 
 install(TARGETS
-	sbPublisher
-	sbSubscriber
+	publisher
+	subscriber
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
 	RUNTIME DESTINATION lib/${PROJECT_NAME}

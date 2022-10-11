@@ -7,12 +7,12 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='simple_pubsub',
-            executable='sbPublisher',
+            executable='publisher',
             output='screen'
         ),
         Node(
             package='simple_pubsub',
-            executable='sbSubscriber',
+            executable='subscriber',
             output='screen'
         )
     ])
