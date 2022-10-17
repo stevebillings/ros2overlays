@@ -1,1 +1,0 @@
-/home/steve/src/ros2overlays/simple_pubsub/build/simple_pubsub/ament_cmake_core/simple_pubsubConfig-version.cmake
