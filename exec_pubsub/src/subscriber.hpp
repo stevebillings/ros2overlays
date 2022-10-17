@@ -11,7 +11,7 @@ class SubscriberNode : public rclcpp::Node {
 		}
 
 		void callback(const std_msgs::msg::Int32::SharedPtr msg) {
-			RCLCPP_INFO(get_logger(), "Hello %d", msg->data);
+			RCLCPP_INFO(get_logger(), "Received %d from topic sb_int_topic", msg->data);
 		}
 
 	private:

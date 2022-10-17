@@ -8,6 +8,7 @@ class PublisherNode : public rclcpp::Node {
 		PublisherNode() : Node("publisher_node") {
 			publisher_ = create_publisher<std_msgs::msg::Int32>("sb_int_topic", 10);
 			timer_ = create_wall_timer(1s, std::bind(&PublisherNode::timer_callback, this));
+			RCLCPP_INFO(get_logger(), "Will be publishing ints to topic sb_int_topic");
 		}
 
 		void timer_callback() {
