@@ -3,9 +3,9 @@
 <package format="3">
   <name>pubsub_py</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="billings.steve@gmail.com">root</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Python publisher/subscriber (for learning ROS2)</description>
+  <maintainer email="billings.steve@gmail.com">stevebillings</maintainer>
+  <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
