@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'service = py_srvcli.service_member_function:main',
             'client = py_srvcli.client_member_function:main',
+            'client3 = py_srvcli.client3_member_function:main',
         ],
     },
 )
