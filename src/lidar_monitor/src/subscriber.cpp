@@ -27,10 +27,16 @@ class SubscriberNode : public rclcpp::Node {
 				i++;
 			}
 			// RCLCPP_INFO(get_logger(), "\tfound min range %f at index %d", min_range, min_range_index);
+            int dead_ahead = msg->ranges.size() / 2;
+            int ahead_width = msg->ranges.size() / 10;
+            int ahead_width_from_center = ahead_width / 2;
+            int right_limit = dead_ahead - ahead_width_from_center;
+            int left_limit = dead_ahead + ahead_width_from_center;
+            // RCLCPP_INFO(get_logger(), "Ahead is %d to %d", right_limit, left_limit);
             if (min_range < 2.0) {
-                if (min_range_index < 350) {
+                if (min_range_index < right_limit) {
                     RCLCPP_INFO(get_logger(), "Obstacle on right: %f meters", min_range);
-                } else if (min_range_index > 370) {
+                } else if (min_range_index > left_limit) {
                     RCLCPP_INFO(get_logger(), "Obstacle on left: %f meters", min_range);
                 } else {
                     RCLCPP_INFO(get_logger(), "Obstacle straight ahead: %f meters", min_range);

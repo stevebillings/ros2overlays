@@ -56,4 +56,39 @@ gazebo 6 (ign gazebo) with fortress.sdf:
 ign topic --topic /cmd_vel --msgtype ignition.msgs.Twist --pub "linear: {x: 0.1, y: 0.0, z: 9.0}"
 ign topic --topic /imu --echo
 
+Reading Lidar
+
+Create bridge between ros and simulated robot lidar:
+Gazebo topic: /lidar
+ROS topic: /laser_scan
+ros2 run ros_ign_bridge parameter_bridge /lidar@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan --ros-args -r /lidar:=/laser_scan
+
+Moving robot using ign topic
+
+ign topic --topic /cmd_vel --msgtype ignition.msgs.Twist --pub "linear: {x: -0.0, y: 0.0, z: 9.0}, angular: {x: 0.0, y: 0.0, z: 0.1}"
+
+Moving robot using teleop_twist_keyboard (ROS)
+
+ros2 run ros_ign_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
+# (Both use the same topic name: /cmd_vel; no remap required)
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+
+Algorithm:
+
+while (true)
+	Find the wall
+	Find parallel path
+	Drive for a bit
+
+Find the wall:
+	until found:
+		spin right
+
+Find parallel path:
+	until clear again
+		slowly spin left
+
+Drive for a bit:
+	Straight ahead for a bit
 

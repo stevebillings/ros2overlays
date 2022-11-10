@@ -4,9 +4,11 @@
 
 using std::placeholders::_1;
 
+// I think I'm abandoning this one; not sure it's (range value-less) output is going to be useful
+// If resurrected, see subscriber.cpp for the right way to calculate angle indices for left/straight/right
 class SubscriberNode : public rclcpp::Node {
 	public:
-		SubscriberNode() : Node("laser_montor_node") {
+		SubscriberNode() : Node("laser_monitor_node") {
 			subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
 					std::bind(&SubscriberNode::callback, this, _1));
             publisher_ = this->create_publisher<std_msgs::msg::String>("obstacle_position", 10);
