@@ -26,7 +26,7 @@ https://gazebosim.org/docs/garden/ros2_integration
 Racetrack: https://app.gazebosim.org/OpenRobotics/fuel/worlds/Prius%20on%20Sonoma%20Raceway
 Download sonoma.sdf and reference it by file path.
 
-### Current
+### Simulated robot car: attempts to get it working
 
 https://gazebosim.org/docs/garden/install_ubuntu
 
@@ -47,12 +47,15 @@ gz sim -v 4 -r ~/src/gazebo/worlds/sensor_tutorial/sensor_tutorial.sdf
 	Does create /imu topic (and others)
 ==> No idea why I can't get this to work.
 
-This works:
+### Simulated robot car startup w/ notes and intermediate steps
+
+This works: Gazebo 6 (Fortress) with corresponding fortress sdf file:
 	
-Switched to Fortress (earlier) version of tutorial, which uses ignition.msgs.Twist:
+Fortress (earlier) version of tutorial uses ignition.msgs.Twist:
 sensor_tutorial_fortress.sdf
 
-gazebo 6 (ign gazebo) with fortress.sdf:
+ign gazebo -v 3 -r ~/src/gazebo/worlds/sensor_tutorial/sensor_tutorial_fortress.sdf
+
 ign topic --topic /cmd_vel --msgtype ignition.msgs.Twist --pub "linear: {x: 0.1, y: 0.0, z: 9.0}"
 ign topic --topic /imu --echo
 
@@ -73,8 +76,50 @@ ros2 run ros_ign_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]igniti
 # (Both use the same topic name: /cmd_vel; no remap required)
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
+# Monitor lidar for obstacles
+cd src/ros2overlays/
+source install/setup.bash 
+ros2 run lidar_monitor subscriber
 
-Algorithm:
+## Simulated robot car startup
+
+For notes and intermediate steps, see above.
+
+Gazebo 6 (Fortress) with corresponding fortress sdf file:
+
+ign gazebo -v 3 -r ~/src/gazebo/worlds/sensor_tutorial/sensor_tutorial_fortress.sdf
+ros2 run ros_ign_bridge parameter_bridge /lidar@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan --ros-args -r /lidar:=/laser_scan
+ros2 run ros_ign_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+cd src/ros2overlays/
+source install/setup.bash 
+ros2 run lidar_monitor subscriber
+
+## Tasks
+
+### Task 1: Drive and spin
+
+#### Task 1a: Drive
+
+#### Task 1b: Drive and spin
+
+### Task 2: Bump and go
+
+from state / input / to state:
+
+stopped / clear / driving
+driving / obstacle any dir within 3m / spinning
+spinning / clear ahead / driving
+
+### Task 3: Mill around the object
+
+Min distance from wall: about 1.5 meters
+Lidar can see fine at 6 meters (likely more)
+Get within 4 meters
+Then stay 2 - 4 m from object
+Lidar can see back to about 4:00/8:00.
+
+Figure out states/transitions for this:
 
 while (true)
 	Find the wall
@@ -91,4 +136,7 @@ Find parallel path:
 
 Drive for a bit:
 	Straight ahead for a bit
+
+
+
 
