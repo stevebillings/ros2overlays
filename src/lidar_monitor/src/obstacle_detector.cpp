@@ -9,8 +9,8 @@ using std::placeholders::_1;
 class SubscriberNode : public rclcpp::Node {
 	public:
 		SubscriberNode() : Node("laser_monitor_node") {
-			subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
-					std::bind(&SubscriberNode::callback, this, _1));
+            laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
+                                                                                      std::bind(&SubscriberNode::callback, this, _1));
             publisher_ = this->create_publisher<std_msgs::msg::String>("obstacle_position", 10);
 		}
 
@@ -45,7 +45,7 @@ class SubscriberNode : public rclcpp::Node {
 		}
 
 	private:
-		rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscriber_;
+		rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
 };
