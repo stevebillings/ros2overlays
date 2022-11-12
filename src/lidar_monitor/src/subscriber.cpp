@@ -11,7 +11,7 @@ class SubscriberNode : public rclcpp::Node {
             laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
                                                                                       std::bind(&SubscriberNode::callback, this, _1));
             // TODO once working, period should be 50ms
-            timer_ = create_wall_timer(500ms, std::bind(&SubscriberNode::control_cycle, this));
+            timer_ = create_wall_timer(2000ms, std::bind(&SubscriberNode::control_cycle, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
 		}
 
@@ -26,6 +26,10 @@ class SubscriberNode : public rclcpp::Node {
                 return;
             }
             interpret_laser(laser_scan_msg_);
+            evaluate_obstacle_last_seen();
+            if (is_obstacle_within_range()) {
+                obstacle_found_ = true;
+            }
             if (ok_to_drive()) {
                 RCLCPP_INFO(get_logger(), "Go straight");
                 drive_straight();
@@ -36,9 +40,38 @@ class SubscriberNode : public rclcpp::Node {
         }
 
         bool ok_to_drive() {
-            return ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
-             && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
-             && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
+            bool ok = false;
+            if (!obstacle_found_) {
+                RCLCPP_INFO(get_logger(), "Obstacle has NEVER been seen; OK to drive? ahead_dist: %d; left_dist: %d; right_dist: %d",
+                            ahead_dist_, left_dist_, right_dist_);
+                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
+                        && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
+                        && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
+                if (!ok) {
+                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause have never gotten close to obstacle and we're not close now");
+                }
+            } else {
+                RCLCPP_INFO(get_logger(),
+                            "Obstacle has been seen (at least once); OK to drive? left_dist: %d; right_dist: %d",
+                            left_dist_, right_dist_);
+                if ((ahead_dist_ == DIST_NAME_FAR) && (left_dist_ == DIST_NAME_FAR) && (right_dist_ == DIST_NAME_FAR)) {
+                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we've left the obstacle");
+                    return false; // TODO this is ugly
+                }
+                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
+                      && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
+                      && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
+                if (!ok) {
+                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we have been close to obstacle but now we're not");
+                }
+            }
+            return ok;
+        }
+
+        bool is_obstacle_within_range() {
+            return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_OK)
+                    || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_OK)
+                    || (right_dist_ == DIST_NAME_NEAR || right_dist_ == DIST_NAME_OK));
         }
 
         void interpret_laser(sensor_msgs::msg::LaserScan::SharedPtr msg) {
@@ -102,15 +135,33 @@ class SubscriberNode : public rclcpp::Node {
             RCLCPP_INFO(get_logger(), "left: %d; right: %d: ahead: %d (0=near, 1=ok, 2=far)", left_dist_, right_dist_, ahead_dist_);
 		}
 
+        void evaluate_obstacle_last_seen() {
+            if (spinning_) {
+                return;
+            }
+            if (right_dist_ == DIST_NAME_OK) {
+                obstacle_last_seen_ = OBSTACLE_LAST_SEEN_RIGHT;
+            } else if (left_dist_ == DIST_NAME_OK) {
+                obstacle_last_seen_ = OBSTACLE_LAST_SEEN_LEFT;
+            }
+            if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) {
+                RCLCPP_INFO(get_logger(), "Obstacle was last seen on the right");
+            } else if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_LEFT) {
+                RCLCPP_INFO(get_logger(), "Obstacle was last seen on the left");
+            }
+        }
+
         void drive_straight() {
+            float speed = 0.2;
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
-            drive_message_.linear.x = 0.1; // ahead
+            drive_message_.linear.x = speed; // ahead
             drive_message_.linear.y = 0.0;
             drive_message_.linear.z = 0.0;
             drive_message_.angular.x = 0.0;
             drive_message_.angular.y = 0.0;
             drive_message_.angular.z = 0.0; // yaw
             drive_publisher_->publish(drive_message_);
+            spinning_ = false;
         }
 
         void stop() {
@@ -121,19 +172,31 @@ class SubscriberNode : public rclcpp::Node {
             drive_message_.angular.y = 0.0;
             drive_message_.angular.z = 0.0; // yaw
             drive_publisher_->publish(drive_message_);
+            spinning_ = false;
         }
 
         void spin() {
+            float yaw = 0.1; // default to spin left
+            if (obstacle_last_seen_ != OBSTACLE_LAST_SEEN_NOWHERE) {
+                if ((obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) && (right_dist_ == DIST_NAME_FAR)) {
+                    yaw = -1.0 * yaw; // switch to spin right
+                }
+            }
             drive_message_.linear.x = 0.0; // ahead
             drive_message_.linear.y = 0.0;
             drive_message_.linear.z = 0.0;
             drive_message_.angular.x = 0.0;
             drive_message_.angular.y = 0.0;
-            drive_message_.angular.z = 0.1; // yaw
+            drive_message_.angular.z = yaw; // yaw
             drive_publisher_->publish(drive_message_);
+            spinning_ = true;
         }
 
+
 	private:
+        static const int OBSTACLE_LAST_SEEN_NOWHERE = 0;
+        static const int OBSTACLE_LAST_SEEN_LEFT = 1;
+        static const int OBSTACLE_LAST_SEEN_RIGHT = 2;
         static const int OK_LIMIT = 4.0;
         static const int NEAR_LIMIT = 2.0;
         static const int DIST_NAME_NEAR = 0;
@@ -142,12 +205,15 @@ class SubscriberNode : public rclcpp::Node {
         int left_dist_ = DIST_NAME_FAR;
         int right_dist_ = DIST_NAME_FAR;
         int ahead_dist_ = DIST_NAME_FAR;
+        int obstacle_last_seen_ = OBSTACLE_LAST_SEEN_NOWHERE;
+
+        rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
-        rclcpp::TimerBase::SharedPtr timer_;
-
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         geometry_msgs::msg::Twist drive_message_;
+        bool obstacle_found_ = false;
+        bool spinning_ = false;
 };
 
 int main(int argc, char * argv[])
