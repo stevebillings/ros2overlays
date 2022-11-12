@@ -11,7 +11,7 @@ class SubscriberNode : public rclcpp::Node {
             laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
                                                                                       std::bind(&SubscriberNode::callback, this, _1));
             // TODO once working, period should be 50ms
-            timer_ = create_wall_timer(2000ms, std::bind(&SubscriberNode::control_cycle, this));
+            timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_cycle, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
 		}
 
@@ -181,9 +181,6 @@ class SubscriberNode : public rclcpp::Node {
 		}
 
         void evaluate_obstacle_last_seen() {
-//            if (spinning_) {
-//                return;
-//            }
             if (right_dist_ == DIST_NAME_OK) {
                 obstacle_last_seen_ = OBSTACLE_LAST_SEEN_RIGHT;
             } else if (left_dist_ == DIST_NAME_OK) {
@@ -197,9 +194,8 @@ class SubscriberNode : public rclcpp::Node {
         }
 
         void drive_straight() {
-            float speed = 0.2;
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
-            drive_message_.linear.x = speed; // ahead
+            drive_message_.linear.x = SPEED; // ahead
             drive_message_.linear.y = 0.0;
             drive_message_.linear.z = 0.0;
             drive_message_.angular.x = 0.0;
@@ -210,27 +206,25 @@ class SubscriberNode : public rclcpp::Node {
         }
 
     void curve_right() {
-        float speed = 0.2;
         RCLCPP_INFO(get_logger(), "Driving straight ahead");
-        drive_message_.linear.x = speed; // ahead
+        drive_message_.linear.x = SPEED; // ahead
         drive_message_.linear.y = 0.0;
         drive_message_.linear.z = 0.0;
         drive_message_.angular.x = 0.0;
         drive_message_.angular.y = 0.0;
-        drive_message_.angular.z = -0.05; // yaw
+        drive_message_.angular.z = -1 * SPEED / 5.0; // yaw
         drive_publisher_->publish(drive_message_);
         spinning_ = false;
     }
 
     void curve_left() {
-        float speed = 0.2;
         RCLCPP_INFO(get_logger(), "Driving straight ahead");
-        drive_message_.linear.x = speed; // ahead
+        drive_message_.linear.x = SPEED; // ahead
         drive_message_.linear.y = 0.0;
         drive_message_.linear.z = 0.0;
         drive_message_.angular.x = 0.0;
         drive_message_.angular.y = 0.0;
-        drive_message_.angular.z = 0.05; // yaw
+        drive_message_.angular.z = SPEED / 5.0; // yaw
         drive_publisher_->publish(drive_message_);
         spinning_ = false;
     }
@@ -247,7 +241,7 @@ class SubscriberNode : public rclcpp::Node {
         }
 
         void spin() {
-            float yaw = 0.1; // default to spin left
+            float yaw = SPEED / 5.0; // default to spin left
             if (obstacle_last_seen_ != OBSTACLE_LAST_SEEN_NOWHERE) {
                 if ((obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) && (right_dist_ == DIST_NAME_FAR)) {
                     yaw = -1.0 * yaw; // switch to spin right
@@ -270,6 +264,7 @@ class SubscriberNode : public rclcpp::Node {
         sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         geometry_msgs::msg::Twist drive_message_;
+        static constexpr float SPEED = 1.0;
         static const int DIR_UNKNOWN = 0;
         static const int DIR_AHEAD = 1;
         static const int DIR_LEFT = 2;
@@ -277,8 +272,8 @@ class SubscriberNode : public rclcpp::Node {
         static const int OBSTACLE_LAST_SEEN_NOWHERE = 0;
         static const int OBSTACLE_LAST_SEEN_LEFT = 1;
         static const int OBSTACLE_LAST_SEEN_RIGHT = 2;
-        static const int OK_LIMIT = 4.0;
-        static const int NEAR_LIMIT = 2.0;
+        static const int OK_LIMIT = 5.0;
+        static const int NEAR_LIMIT = 3.0;
         static const int DIST_NAME_NEAR = 0;
         static const int DIST_NAME_OK = 1;
         static const int DIST_NAME_FAR = 2;
