@@ -28,8 +28,8 @@ class DriverNode : public rclcpp::Node {
 		}
 	private:
 		rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
+        geometry_msgs::msg::Twist message_;
 		rclcpp::TimerBase::SharedPtr timer_;
-		geometry_msgs::msg::Twist message_;
 		int state_ = 0;
 };
 

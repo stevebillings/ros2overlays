@@ -1,5 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -9,10 +10,14 @@ class SubscriberNode : public rclcpp::Node {
 		SubscriberNode() : Node("laser_monitor_node") {
             laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
                                                                                       std::bind(&SubscriberNode::callback, this, _1));
-            timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_cycle, this));
+            // TODO once working, period should be 50ms
+            timer_ = create_wall_timer(500ms, std::bind(&SubscriberNode::control_cycle, this));
+            drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
 		}
 
+        // TODO I think all of these can be private:
 		void callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+            // TODO is this a concurrency-safe operation?
             laser_scan_msg_ = std::move(msg);
         }
 
@@ -21,11 +26,19 @@ class SubscriberNode : public rclcpp::Node {
                 return;
             }
             interpret_laser(laser_scan_msg_);
-            if (ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK) {
+            if (ok_to_drive()) {
                 RCLCPP_INFO(get_logger(), "Go straight");
+                drive_straight();
             } else {
-                RCLCPP_INFO(get_logger(), "Stop");
+                RCLCPP_INFO(get_logger(), "Spin");
+                spin();
             }
+        }
+
+        bool ok_to_drive() {
+            return ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
+             && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
+             && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
         }
 
         void interpret_laser(sensor_msgs::msg::LaserScan::SharedPtr msg) {
@@ -89,6 +102,37 @@ class SubscriberNode : public rclcpp::Node {
             RCLCPP_INFO(get_logger(), "left: %d; right: %d: ahead: %d (0=near, 1=ok, 2=far)", left_dist_, right_dist_, ahead_dist_);
 		}
 
+        void drive_straight() {
+            RCLCPP_INFO(get_logger(), "Driving straight ahead");
+            drive_message_.linear.x = 0.1; // ahead
+            drive_message_.linear.y = 0.0;
+            drive_message_.linear.z = 0.0;
+            drive_message_.angular.x = 0.0;
+            drive_message_.angular.y = 0.0;
+            drive_message_.angular.z = 0.0; // yaw
+            drive_publisher_->publish(drive_message_);
+        }
+
+        void stop() {
+            drive_message_.linear.x = 0.0; // ahead
+            drive_message_.linear.y = 0.0;
+            drive_message_.linear.z = 0.0;
+            drive_message_.angular.x = 0.0;
+            drive_message_.angular.y = 0.0;
+            drive_message_.angular.z = 0.0; // yaw
+            drive_publisher_->publish(drive_message_);
+        }
+
+        void spin() {
+            drive_message_.linear.x = 0.0; // ahead
+            drive_message_.linear.y = 0.0;
+            drive_message_.linear.z = 0.0;
+            drive_message_.angular.x = 0.0;
+            drive_message_.angular.y = 0.0;
+            drive_message_.angular.z = 0.1; // yaw
+            drive_publisher_->publish(drive_message_);
+        }
+
 	private:
         static const int OK_LIMIT = 4.0;
         static const int NEAR_LIMIT = 2.0;
@@ -101,16 +145,16 @@ class SubscriberNode : public rclcpp::Node {
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
         rclcpp::TimerBase::SharedPtr timer_;
+
+        rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
+        geometry_msgs::msg::Twist drive_message_;
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-
   auto node = std::make_shared<SubscriberNode>();
-
   rclcpp::spin(node);
-
   rclcpp::shutdown();
   return 0;
 }
