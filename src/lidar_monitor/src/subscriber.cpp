@@ -13,6 +13,7 @@ class SubscriberNode : public rclcpp::Node {
             // TODO once working, period should be 50ms
             timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_cycle, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
+            set_state(STATE_SEARCH);
 		}
 
         // TODO I think all of these can be private:
@@ -31,10 +32,10 @@ class SubscriberNode : public rclcpp::Node {
             evaluate_obstacle_last_seen();
 
             switch (state_) {
-                case STATE_TOTALLY_LOST:
-                    if (is_obstacle_within_range()) {
+                case STATE_SEARCH:
+                    if (is_obstacle_within_range() && (obstacle_direction_ == DIR_RIGHT)) {
                         stop();
-                        state_ = STATE_HUGGING;
+                        set_state(STATE_HUGGING);
                     } else {
                         if (obstacle_direction_ == DIR_AHEAD) {
                             drive_straight();
@@ -46,7 +47,7 @@ class SubscriberNode : public rclcpp::Node {
                 case STATE_HUGGING:
                     if (!is_obstacle_within_range()) {
                         stop();
-                        state_ = STATE_RECENTLY_LOST;
+                        set_state(STATE_RECENTLY_LOST);
                     } else if (ok_to_drive()) {
                         RCLCPP_INFO(get_logger(), "Go straight");
                         drive_straight();
@@ -58,10 +59,11 @@ class SubscriberNode : public rclcpp::Node {
                 case STATE_RECENTLY_LOST:
                     if (is_obstacle_within_range()) {
                         stop();
-                        state_ = STATE_HUGGING;
-                        break;
-                    }
-                    if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) {
+                        set_state(STATE_HUGGING);
+                    } else if (get_seconds_in_state() > 2.0) {
+                        stop();
+                        set_state(STATE_SEARCH);
+                    } else if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) {
                         curve_right();
                     } else {
                         curve_left();
@@ -69,13 +71,21 @@ class SubscriberNode : public rclcpp::Node {
                     break;
                 default:
                     RCLCPP_WARN(get_logger(), "Invalid state: %d", state_);
-                    state_ = STATE_TOTALLY_LOST;
+                    set_state(STATE_SEARCH);
             }
+        }
+
+        double get_seconds_in_state() {
+            rclcpp::Time right_now = now();
+            rclcpp::Duration time_in_state = right_now - state_ts_;
+            double seconds_in_state = time_in_state.seconds();
+            RCLCPP_INFO(get_logger(), "Seconds since entered current state: %lf", seconds_in_state);
+            return seconds_in_state;
         }
 
         bool ok_to_drive() {
             bool ok = false;
-            if (state_ == STATE_TOTALLY_LOST) {
+            if (state_ == STATE_SEARCH) {
                 RCLCPP_INFO(get_logger(), "Obstacle has NEVER been seen; OK to drive? ahead_dist: %d; left_dist: %d; right_dist: %d",
                             ahead_dist_, left_dist_, right_dist_);
                 ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
@@ -205,29 +215,29 @@ class SubscriberNode : public rclcpp::Node {
             spinning_ = false;
         }
 
-    void curve_right() {
-        RCLCPP_INFO(get_logger(), "Driving straight ahead");
-        drive_message_.linear.x = SPEED; // ahead
-        drive_message_.linear.y = 0.0;
-        drive_message_.linear.z = 0.0;
-        drive_message_.angular.x = 0.0;
-        drive_message_.angular.y = 0.0;
-        drive_message_.angular.z = -1 * SPEED / 5.0; // yaw
-        drive_publisher_->publish(drive_message_);
-        spinning_ = false;
-    }
+        void curve_right() {
+            RCLCPP_INFO(get_logger(), "Driving straight ahead");
+            drive_message_.linear.x = SPEED; // ahead
+            drive_message_.linear.y = 0.0;
+            drive_message_.linear.z = 0.0;
+            drive_message_.angular.x = 0.0;
+            drive_message_.angular.y = 0.0;
+            drive_message_.angular.z = -1 * SPEED / 5.0; // yaw
+            drive_publisher_->publish(drive_message_);
+            spinning_ = false;
+        }
 
-    void curve_left() {
-        RCLCPP_INFO(get_logger(), "Driving straight ahead");
-        drive_message_.linear.x = SPEED; // ahead
-        drive_message_.linear.y = 0.0;
-        drive_message_.linear.z = 0.0;
-        drive_message_.angular.x = 0.0;
-        drive_message_.angular.y = 0.0;
-        drive_message_.angular.z = SPEED / 5.0; // yaw
-        drive_publisher_->publish(drive_message_);
-        spinning_ = false;
-    }
+        void curve_left() {
+            RCLCPP_INFO(get_logger(), "Driving straight ahead");
+            drive_message_.linear.x = SPEED; // ahead
+            drive_message_.linear.y = 0.0;
+            drive_message_.linear.z = 0.0;
+            drive_message_.angular.x = 0.0;
+            drive_message_.angular.y = 0.0;
+            drive_message_.angular.z = SPEED / 5.0; // yaw
+            drive_publisher_->publish(drive_message_);
+            spinning_ = false;
+        }
 
         void stop() {
             drive_message_.linear.x = 0.0; // ahead
@@ -257,13 +267,18 @@ class SubscriberNode : public rclcpp::Node {
             spinning_ = true;
         }
 
-
+        void set_state(int new_state) {
+            state_ = new_state;
+            state_ts_ = now();
+            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_, state_ts_.nanoseconds());
+        }
 	private:
         rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         geometry_msgs::msg::Twist drive_message_;
+        rclcpp::Time state_ts_;
         static constexpr float SPEED = 1.0;
         static const int DIR_UNKNOWN = 0;
         static const int DIR_AHEAD = 1;
@@ -287,10 +302,10 @@ class SubscriberNode : public rclcpp::Node {
         // TOTALLY_LOST : need to find heading of, and head toward, obstacle
         // HUGGING : near obstacle
         // RECENTLY_LOST : recently lost sight of obstacle
-        static const int STATE_TOTALLY_LOST = 0;
+        static const int STATE_SEARCH = 0;
         static const int STATE_HUGGING = 1;
         static const int STATE_RECENTLY_LOST = 2;
-        int state_ = STATE_TOTALLY_LOST;
+        int state_;
         int obstacle_direction_ = DIR_UNKNOWN;
 };
 
