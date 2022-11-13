@@ -33,8 +33,7 @@ class SubscriberNode : public rclcpp::Node {
 
             switch (state_) {
                 case STATE_SEARCH:
-                    if (is_obstacle_within_range() && (obstacle_direction_ == DIR_RIGHT)) {
-                        stop();
+                    if (is_obstacle_within_range()) {
                         set_state(STATE_HUGGING);
                     } else {
                         if (obstacle_direction_ == DIR_AHEAD) {
@@ -116,6 +115,12 @@ class SubscriberNode : public rclcpp::Node {
             return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_OK)
                     || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_OK)
                     || (right_dist_ == DIST_NAME_NEAR || right_dist_ == DIST_NAME_OK));
+        }
+
+        bool is_obstacle_near() {
+            return ((ahead_dist_ == DIST_NAME_NEAR)
+                    || (left_dist_ == DIST_NAME_NEAR)
+                    || (right_dist_ == DIST_NAME_NEAR));
         }
 
         void interpret_laser(sensor_msgs::msg::LaserScan::SharedPtr msg) {
@@ -251,7 +256,7 @@ class SubscriberNode : public rclcpp::Node {
         }
 
         void spin() {
-            float yaw = SPEED / 5.0; // default to spin left
+            float yaw = SPEED / 4.0; // default to spin left
             if (obstacle_last_seen_ != OBSTACLE_LAST_SEEN_NOWHERE) {
                 if ((obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) && (right_dist_ == DIST_NAME_FAR)) {
                     yaw = -1.0 * yaw; // switch to spin right
