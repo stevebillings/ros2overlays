@@ -84,9 +84,9 @@ class SubscriberNode : public rclcpp::Node {
             if (state_ == STATE_SEARCH) {
                 RCLCPP_INFO(get_logger(), "Obstacle has NEVER been seen; OK to drive? ahead_dist: %d; left_dist: %d; right_dist: %d",
                             ahead_dist_, left_dist_, right_dist_);
-                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
-                        && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
-                        && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
+                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_IDEAL)
+                        && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_IDEAL)
+                        && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_IDEAL));
                 if (!ok) {
                     RCLCPP_INFO(get_logger(), "Not OK to drive 'cause have never gotten close to obstacle and we're not close now");
                 }
@@ -98,9 +98,9 @@ class SubscriberNode : public rclcpp::Node {
                     RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we've left the obstacle");
                     return false; // TODO this is ugly
                 }
-                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_OK)
-                      && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_OK)
-                      && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_OK));
+                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_IDEAL)
+                      && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_IDEAL)
+                      && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_IDEAL));
                 if (!ok) {
                     RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we have been close to obstacle but now we're not");
                 }
@@ -109,15 +109,23 @@ class SubscriberNode : public rclcpp::Node {
         }
 
         bool is_obstacle_within_range() {
-            return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_OK)
-                    || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_OK)
-                    || (right_dist_ == DIST_NAME_NEAR || right_dist_ == DIST_NAME_OK));
+            return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_IDEAL)
+                    || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_IDEAL)
+                    || (right_dist_ == DIST_NAME_NEAR || right_dist_ == DIST_NAME_IDEAL));
         }
 
-        bool is_obstacle_near() {
+        bool is_obstacle_too_near() {
             return ((ahead_dist_ == DIST_NAME_NEAR)
                     || (left_dist_ == DIST_NAME_NEAR)
                     || (right_dist_ == DIST_NAME_NEAR));
+        }
+
+        bool is_obstacle_distance_ideal() {
+            bool one_is_ideal = ((ahead_dist_ == DIST_NAME_IDEAL)
+                    || (left_dist_ == DIST_NAME_IDEAL)
+                    || (right_dist_ == DIST_NAME_IDEAL));
+
+            return one_is_ideal && !is_obstacle_too_near();
         }
 
         void interpret_laser(sensor_msgs::msg::LaserScan::SharedPtr msg) {
@@ -149,7 +157,7 @@ class SubscriberNode : public rclcpp::Node {
                     if (min_range < NEAR_LIMIT) {
                         right_dist_ = DIST_NAME_NEAR;
                     } else {
-                        right_dist_ = DIST_NAME_OK;
+                        right_dist_ = DIST_NAME_IDEAL;
                     }
                     left_dist_ = DIST_NAME_FAR;
                     ahead_dist_ = DIST_NAME_FAR;
@@ -158,7 +166,7 @@ class SubscriberNode : public rclcpp::Node {
                     if (min_range < NEAR_LIMIT) {
                         left_dist_ = DIST_NAME_NEAR;
                     } else {
-                        left_dist_ = DIST_NAME_OK;
+                        left_dist_ = DIST_NAME_IDEAL;
                     }
                     right_dist_ = DIST_NAME_FAR;
                     ahead_dist_ = DIST_NAME_FAR;
@@ -167,7 +175,7 @@ class SubscriberNode : public rclcpp::Node {
                     if (min_range < NEAR_LIMIT) {
                         ahead_dist_ = DIST_NAME_NEAR;
                     } else {
-                        ahead_dist_ = DIST_NAME_OK;
+                        ahead_dist_ = DIST_NAME_IDEAL;
                     }
                     right_dist_ = DIST_NAME_FAR;
                     left_dist_ = DIST_NAME_FAR;
@@ -193,9 +201,9 @@ class SubscriberNode : public rclcpp::Node {
 		}
 
         void evaluate_obstacle_last_seen() {
-            if (right_dist_ == DIST_NAME_OK) {
+            if (right_dist_ == DIST_NAME_IDEAL) {
                 obstacle_last_seen_ = OBSTACLE_LAST_SEEN_RIGHT;
-            } else if (left_dist_ == DIST_NAME_OK) {
+            } else if (left_dist_ == DIST_NAME_IDEAL) {
                 obstacle_last_seen_ = OBSTACLE_LAST_SEEN_LEFT;
             }
             if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) {
@@ -277,7 +285,7 @@ class SubscriberNode : public rclcpp::Node {
         static const int OK_LIMIT = 5.0;
         static const int NEAR_LIMIT = 3.0;
         static const int DIST_NAME_NEAR = 0;
-        static const int DIST_NAME_OK = 1;
+        static const int DIST_NAME_IDEAL = 1;
         static const int DIST_NAME_FAR = 2;
         int left_dist_ = DIST_NAME_FAR;
         int right_dist_ = DIST_NAME_FAR;
