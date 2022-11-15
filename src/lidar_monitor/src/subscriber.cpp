@@ -16,7 +16,7 @@ class SubscriberNode : public rclcpp::Node {
             set_state(STATE_SEARCH);
 		}
 
-        // TODO I think all of these can be private:
+    private:
 		void callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
             // TODO is this a concurrency-safe operation?
             laser_scan_msg_ = std::move(msg);
@@ -24,7 +24,7 @@ class SubscriberNode : public rclcpp::Node {
 
         void control_cycle() {
             RCLCPP_INFO(get_logger(), "======================");
-            RCLCPP_INFO(get_logger(), "State: %d (1 = hugging, 2 = recently lost", state_);
+            RCLCPP_INFO(get_logger(), "State: %d (0 = search; 1 = hugging, 2 = recently lost", state_);
             if (laser_scan_msg_ == nullptr) {
                 return;
             }
