@@ -3,4 +3,5 @@ log/
 install/
 __pycache__/
 .idea/
+.cmake/
 cmake-build-debug/
