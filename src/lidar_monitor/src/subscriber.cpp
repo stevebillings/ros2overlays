@@ -27,24 +27,25 @@ class SubscriberNode : public rclcpp::Node {
 	public:
 		SubscriberNode() : Node("laser_monitor_node") {
             laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
-                                                                                      std::bind(&SubscriberNode::callback, this, _1));
+                                                                                      std::bind(
+                                                                                              &SubscriberNode::laser_scan_callback, this, _1));
             // TODO once working, period should be 50ms
-            timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_cycle, this));
+            timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_callback, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
             set_state(STATE_SEARCH);
 		}
 
     private:
-		void callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+		void laser_scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
             // TODO is this a concurrency-safe operation?
             laser_scan_msg_ = std::move(msg);
         }
 
-        void control_cycle() {
+        void control_callback() {
             RCLCPP_INFO(get_logger(), "======================");
             RCLCPP_INFO(get_logger(), "State: %d (0 = search; 1 = hugging, 2 = recently lost", state_);
             if (laser_scan_msg_ == nullptr) {
-                return;
+                return; // wait for sight
             }
             interpret_laser(laser_scan_msg_);
             evaluate_obstacle_last_seen();
