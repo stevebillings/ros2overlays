@@ -65,9 +65,6 @@ class SubscriberNode : public rclcpp::Node {
                         curve_left();
                     }
                     break;
-                default:
-                    RCLCPP_WARN(get_logger(), "Invalid state: %d", state_);
-                    set_state(STATE_SEARCH);
             }
         }
 
