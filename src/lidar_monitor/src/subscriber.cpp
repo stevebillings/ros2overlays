@@ -194,35 +194,38 @@ class SubscriberNode : public rclcpp::Node {
 
         void drive_straight() {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
-            drive_message_.linear.x = SPEED; // ahead
-            drive_message_.linear.y = 0.0;
-            drive_message_.linear.z = 0.0;
-            drive_message_.angular.x = 0.0;
-            drive_message_.angular.y = 0.0;
-            drive_message_.angular.z = 0.0; // yaw
-            drive_publisher_->publish(drive_message_);
+            geometry_msgs::msg::Twist drive_message;
+            drive_message.linear.x = SPEED; // ahead
+            drive_message.linear.y = 0.0;
+            drive_message.linear.z = 0.0;
+            drive_message.angular.x = 0.0;
+            drive_message.angular.y = 0.0;
+            drive_message.angular.z = 0.0; // yaw
+            drive_publisher_->publish(drive_message);
         }
 
         void curve_right() {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
-            drive_message_.linear.x = SPEED; // ahead
-            drive_message_.linear.y = 0.0;
-            drive_message_.linear.z = 0.0;
-            drive_message_.angular.x = 0.0;
-            drive_message_.angular.y = 0.0;
-            drive_message_.angular.z = -1 * SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
-            drive_publisher_->publish(drive_message_);
+            geometry_msgs::msg::Twist drive_message;
+            drive_message.linear.x = SPEED; // ahead
+            drive_message.linear.y = 0.0;
+            drive_message.linear.z = 0.0;
+            drive_message.angular.x = 0.0;
+            drive_message.angular.y = 0.0;
+            drive_message.angular.z = -1 * SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
+            drive_publisher_->publish(drive_message);
         }
 
         void curve_left() {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
-            drive_message_.linear.x = SPEED; // ahead
-            drive_message_.linear.y = 0.0;
-            drive_message_.linear.z = 0.0;
-            drive_message_.angular.x = 0.0;
-            drive_message_.angular.y = 0.0;
-            drive_message_.angular.z = SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
-            drive_publisher_->publish(drive_message_);
+            geometry_msgs::msg::Twist drive_message;
+            drive_message.linear.x = SPEED; // ahead
+            drive_message.linear.y = 0.0;
+            drive_message.linear.z = 0.0;
+            drive_message.angular.x = 0.0;
+            drive_message.angular.y = 0.0;
+            drive_message.angular.z = SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
+            drive_publisher_->publish(drive_message);
         }
 
         void spin() {
@@ -232,13 +235,14 @@ class SubscriberNode : public rclcpp::Node {
                     yaw = -1.0 * yaw; // switch to spin right
                 }
             }
-            drive_message_.linear.x = 0.0; // ahead
-            drive_message_.linear.y = 0.0;
-            drive_message_.linear.z = 0.0;
-            drive_message_.angular.x = 0.0;
-            drive_message_.angular.y = 0.0;
-            drive_message_.angular.z = yaw; // yaw
-            drive_publisher_->publish(drive_message_);
+            geometry_msgs::msg::Twist drive_message;
+            drive_message.linear.x = 0.0; // ahead
+            drive_message.linear.y = 0.0;
+            drive_message.linear.z = 0.0;
+            drive_message.angular.x = 0.0;
+            drive_message.angular.y = 0.0;
+            drive_message.angular.z = yaw; // yaw
+            drive_publisher_->publish(drive_message);
         }
 
         void set_state(int new_state) {
@@ -251,7 +255,6 @@ class SubscriberNode : public rclcpp::Node {
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
-        geometry_msgs::msg::Twist drive_message_;
         rclcpp::Time state_ts_;
 
         int left_dist_ = DIST_NAME_FAR;
