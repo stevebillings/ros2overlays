@@ -196,11 +196,6 @@ class SubscriberNode : public rclcpp::Node {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = SPEED; // ahead
-            drive_message.linear.y = 0.0;
-            drive_message.linear.z = 0.0;
-            drive_message.angular.x = 0.0;
-            drive_message.angular.y = 0.0;
-            drive_message.angular.z = 0.0; // yaw
             drive_publisher_->publish(drive_message);
         }
 
@@ -208,10 +203,6 @@ class SubscriberNode : public rclcpp::Node {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = SPEED; // ahead
-            drive_message.linear.y = 0.0;
-            drive_message.linear.z = 0.0;
-            drive_message.angular.x = 0.0;
-            drive_message.angular.y = 0.0;
             drive_message.angular.z = -1 * SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
             drive_publisher_->publish(drive_message);
         }
@@ -220,10 +211,6 @@ class SubscriberNode : public rclcpp::Node {
             RCLCPP_INFO(get_logger(), "Driving straight ahead");
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = SPEED; // ahead
-            drive_message.linear.y = 0.0;
-            drive_message.linear.z = 0.0;
-            drive_message.angular.x = 0.0;
-            drive_message.angular.y = 0.0;
             drive_message.angular.z = SPEED / SPEED_DIVISOR_FOR_CURVE_YAW;
             drive_publisher_->publish(drive_message);
         }
@@ -236,11 +223,6 @@ class SubscriberNode : public rclcpp::Node {
                 }
             }
             geometry_msgs::msg::Twist drive_message;
-            drive_message.linear.x = 0.0; // ahead
-            drive_message.linear.y = 0.0;
-            drive_message.linear.z = 0.0;
-            drive_message.angular.x = 0.0;
-            drive_message.angular.y = 0.0;
             drive_message.angular.z = yaw; // yaw
             drive_publisher_->publish(drive_message);
         }
