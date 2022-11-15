@@ -46,12 +46,12 @@ class SubscriberNode : public rclcpp::Node {
                 case STATE_HUGGING:
                     if (!is_obstacle_within_range()) {
                         set_state(STATE_RECENTLY_LOST);
-                    } else if (ok_to_drive()) {
-                        RCLCPP_INFO(get_logger(), "Go straight");
-                        drive_straight();
                     } else {
-                        RCLCPP_INFO(get_logger(), "Spin");
-                        spin();
+                        if (is_obstacle_far() || is_obstacle_too_near()) {
+                            spin();
+                        } else {
+                            drive_straight();
+                        }
                     }
                     break;
                 case STATE_RECENTLY_LOST:
@@ -79,23 +79,8 @@ class SubscriberNode : public rclcpp::Node {
             return seconds_in_state;
         }
 
-        // TODO this should not handle multiple states!
-        bool ok_to_drive() {
-            bool ok = false;
-            if (state_ == STATE_SEARCH) {
-                ok = !is_obstacle_too_near();
-            } else {
-                if (is_obstacle_far()) {
-                    ok = false;
-                } else {
-                    ok = !is_obstacle_too_near();
-                }
-            }
-            return ok;
-        }
 
-
-        bool is_obstacle_within_range() {
+    bool is_obstacle_within_range() {
             return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_IDEAL)
                     || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_IDEAL)
                     || (right_dist_ == DIST_NAME_NEAR || right_dist_ == DIST_NAME_IDEAL));
