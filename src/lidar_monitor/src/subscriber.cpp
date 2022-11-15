@@ -79,26 +79,17 @@ class SubscriberNode : public rclcpp::Node {
             return seconds_in_state;
         }
 
+        // TODO this should not handle multiple states!
         bool ok_to_drive() {
             bool ok = false;
             if (state_ == STATE_SEARCH) {
-                RCLCPP_INFO(get_logger(), "Obstacle has NEVER been seen; OK to drive? ahead_dist: %d; left_dist: %d; right_dist: %d",
-                            ahead_dist_, left_dist_, right_dist_);
-                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_IDEAL)
-                        && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_IDEAL)
-                        && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_IDEAL));
-                if (!ok) {
-                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause have never gotten close to obstacle and we're not close now");
-                }
-            } else {
-                RCLCPP_INFO(get_logger(),
-                            "Obstacle has been seen (at least once); OK to drive? left_dist: %d; right_dist: %d",
-                            left_dist_, right_dist_);
-                if ((ahead_dist_ == DIST_NAME_FAR) && (left_dist_ == DIST_NAME_FAR) && (right_dist_ == DIST_NAME_FAR)) {
-                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we've left the obstacle");
-                    return false; // TODO this is ugly
-                }
                 ok = !is_obstacle_too_near();
+            } else {
+                if (is_obstacle_far()) {
+                    ok = false;
+                } else {
+                    ok = !is_obstacle_too_near();
+                }
             }
             return ok;
         }
@@ -114,6 +105,12 @@ class SubscriberNode : public rclcpp::Node {
             return ((ahead_dist_ == DIST_NAME_NEAR)
                     || (left_dist_ == DIST_NAME_NEAR)
                     || (right_dist_ == DIST_NAME_NEAR));
+        }
+
+        bool is_obstacle_far() {
+            return ((ahead_dist_ == DIST_NAME_FAR)
+                    && (left_dist_ == DIST_NAME_FAR)
+                    && (right_dist_ == DIST_NAME_FAR));
         }
 
         bool is_obstacle_distance_ideal() {
