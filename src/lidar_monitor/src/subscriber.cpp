@@ -98,15 +98,11 @@ class SubscriberNode : public rclcpp::Node {
                     RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we've left the obstacle");
                     return false; // TODO this is ugly
                 }
-                ok = ((ahead_dist_ == DIST_NAME_FAR || ahead_dist_ == DIST_NAME_IDEAL)
-                      && (left_dist_ == DIST_NAME_FAR || left_dist_ == DIST_NAME_IDEAL)
-                      && (right_dist_ == DIST_NAME_FAR || right_dist_ == DIST_NAME_IDEAL));
-                if (!ok) {
-                    RCLCPP_INFO(get_logger(), "Not OK to drive 'cause we have been close to obstacle but now we're not");
-                }
+                ok = !is_obstacle_too_near();
             }
             return ok;
         }
+
 
         bool is_obstacle_within_range() {
             return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_IDEAL)
