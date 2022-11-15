@@ -217,10 +217,8 @@ class SubscriberNode : public rclcpp::Node {
 
         void spin() {
             float yaw = SPEED / SPEED_DIVISOR_FOR_SPIN_YAW; // default to spin left
-            if (obstacle_last_seen_ != OBSTACLE_LAST_SEEN_NOWHERE) {
-                if ((obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) && (right_dist_ == DIST_NAME_FAR)) {
-                    yaw = -1.0 * yaw; // switch to spin right
-                }
+            if ((obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) && (right_dist_ == DIST_NAME_FAR)) {
+                yaw = -1.0 * yaw; // switch to spin right
             }
             geometry_msgs::msg::Twist drive_message;
             drive_message.angular.z = yaw; // yaw
