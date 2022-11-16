@@ -24,14 +24,14 @@ static const double MAX_SECS_TO_HOPE_FOR_REDISCOVERY = 2.0;
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
-class SubscriberNode : public rclcpp::Node {
+class ObstacleHuggingNode : public rclcpp::Node {
 	public:
-		SubscriberNode() : Node("laser_monitor_node") {
+		ObstacleHuggingNode() : Node("obstacle_hugging_node") {
             laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>("laser_scan", 10,
                                                                                       std::bind(
-                                                                                              &SubscriberNode::laser_scan_callback, this, _1));
+                                                                                              &ObstacleHuggingNode::laser_scan_callback, this, _1));
             // TODO once working, period should be 50ms
-            timer_ = create_wall_timer(50ms, std::bind(&SubscriberNode::control_callback, this));
+            timer_ = create_wall_timer(50ms, std::bind(&ObstacleHuggingNode::control_callback, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
             set_state(STATE_SEARCH);
 		}
@@ -254,7 +254,7 @@ class SubscriberNode : public rclcpp::Node {
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<SubscriberNode>();
+  auto node = std::make_shared<ObstacleHuggingNode>();
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
