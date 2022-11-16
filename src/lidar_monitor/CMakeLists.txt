@@ -12,12 +12,8 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(subscriber src/subscriber.cpp)
-add_executable(obstacle_detector src/obstacle_detector.cpp)
-add_executable(driver src/driver.cpp)
-ament_target_dependencies(subscriber rclcpp sensor_msgs)
-ament_target_dependencies(obstacle_detector rclcpp sensor_msgs std_msgs)
-ament_target_dependencies(driver rclcpp geometry_msgs)
+add_executable(obstacle_hugger src/obstacle_hugger.cpp)
+ament_target_dependencies(obstacle_hugger rclcpp sensor_msgs)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -32,9 +28,7 @@ if(BUILD_TESTING)
 endif()
 
 install(TARGETS
-  subscriber
-  obstacle_detector
-  driver
+  obstacle_hugger
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
