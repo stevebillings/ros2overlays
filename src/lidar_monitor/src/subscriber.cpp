@@ -20,6 +20,7 @@ static const int DIST_NAME_IDEAL = 1;
 static const int DIST_NAME_FAR = 2;
 static const double SPEED_DIVISOR_FOR_SPIN_YAW = 4.0;
 static const double SPEED_DIVISOR_FOR_CURVE_YAW = 5.0;
+static const double MAX_SECS_TO_HOPE_FOR_REDISCOVERY = 2.0;
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
@@ -37,17 +38,16 @@ class SubscriberNode : public rclcpp::Node {
 
     private:
 		void laser_scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-            // TODO is this a concurrency-safe operation?
-            laser_scan_msg_ = std::move(msg);
+            last_laser_scan_msg_ = std::move(msg);
         }
 
         void control_callback() {
             RCLCPP_INFO(get_logger(), "======================");
             RCLCPP_INFO(get_logger(), "State: %d (0 = search; 1 = hugging, 2 = recently lost", state_);
-            if (laser_scan_msg_ == nullptr) {
+            if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
-            interpret_laser(laser_scan_msg_);
+            interpret_laser(last_laser_scan_msg_);
             evaluate_obstacle_last_seen();
 
             switch (state_) {
@@ -55,7 +55,7 @@ class SubscriberNode : public rclcpp::Node {
                     if (is_obstacle_within_range()) {
                         set_state(STATE_HUGGING);
                     } else {
-                        if (obstacle_direction_ == DIR_AHEAD) {
+                        if (is_obstacle_ahead()) {
                             drive_straight();
                         } else {
                             spin();
@@ -76,9 +76,9 @@ class SubscriberNode : public rclcpp::Node {
                 case STATE_RECENTLY_LOST:
                     if (is_obstacle_within_range()) {
                         set_state(STATE_HUGGING);
-                    } else if (get_seconds_in_state() > 2.0) {
+                    } else if (get_seconds_in_state() > MAX_SECS_TO_HOPE_FOR_REDISCOVERY) {
                         set_state(STATE_SEARCH);
-                    } else if (obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT) {
+                    } else if (is_obstacle_on_right()) {
                         curve_right();
                     } else {
                         curve_left();
@@ -89,13 +89,19 @@ class SubscriberNode : public rclcpp::Node {
 
         double get_seconds_in_state() {
             rclcpp::Time right_now = now();
-            rclcpp::Duration time_in_state = right_now - state_ts_;
+            rclcpp::Duration time_in_state = right_now - state_start_time;
             double seconds_in_state = time_in_state.seconds();
             RCLCPP_INFO(get_logger(), "Seconds since entered current state: %lf", seconds_in_state);
             return seconds_in_state;
         }
 
-
+        bool is_obstacle_ahead() {
+            return obstacle_direction_ == DIR_AHEAD;
+        }
+        
+        bool is_obstacle_on_right() {
+            return obstacle_last_seen_ == OBSTACLE_LAST_SEEN_RIGHT;
+        }
         bool is_obstacle_within_range() {
             return ((ahead_dist_ == DIST_NAME_NEAR || ahead_dist_ == DIST_NAME_IDEAL)
                     || (left_dist_ == DIST_NAME_NEAR || left_dist_ == DIST_NAME_IDEAL)
@@ -117,7 +123,7 @@ class SubscriberNode : public rclcpp::Node {
         void interpret_laser(sensor_msgs::msg::LaserScan::SharedPtr msg) {
 			int i = 0;
 			auto min_range = 999.999;
-			int min_range_index = -1;
+			long min_range_index = -1;
 			for (auto this_range : msg->ranges) {
 				if (this_range < min_range) {
 					min_range = this_range;
@@ -125,11 +131,11 @@ class SubscriberNode : public rclcpp::Node {
 				}
 				i++;
 			}
-            int dead_ahead = msg->ranges.size() / 2;
-            int ahead_width = msg->ranges.size() / 10;
-            int ahead_width_from_center = ahead_width / 2;
-            int right_limit = dead_ahead - ahead_width_from_center;
-            int left_limit = dead_ahead + ahead_width_from_center;
+            unsigned long dead_ahead = msg->ranges.size() / 2;
+            unsigned long ahead_width = msg->ranges.size() / 10;
+            unsigned long ahead_width_from_center = ahead_width / 2;
+            unsigned long right_limit = dead_ahead - ahead_width_from_center;
+            unsigned long left_limit = dead_ahead + ahead_width_from_center;
             if (min_range < OK_LIMIT) {
                 if (min_range_index < right_limit) {
                     RCLCPP_INFO(get_logger(), "Obstacle on right: %f meters", min_range);
@@ -227,15 +233,15 @@ class SubscriberNode : public rclcpp::Node {
 
         void set_state(int new_state) {
             state_ = new_state;
-            state_ts_ = now();
-            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_, state_ts_.nanoseconds());
+            state_start_time = now();
+            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_, state_start_time.nanoseconds());
         }
 	private:
         rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
-        sensor_msgs::msg::LaserScan::SharedPtr laser_scan_msg_;
+        sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
-        rclcpp::Time state_ts_;
+        rclcpp::Time state_start_time;
 
         int left_dist_ = DIST_NAME_FAR;
         int right_dist_ = DIST_NAME_FAR;
