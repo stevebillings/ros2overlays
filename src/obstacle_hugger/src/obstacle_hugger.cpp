@@ -60,10 +60,12 @@ class ObstacleHuggingNode : public rclcpp::Node {
                     }
                     break;
                 case STATE_OBSTACLE_NEAR_NOT_PARALLEL:
+                    RCLCPP_INFO(get_logger(), "min_range_index: %ld", get_min_range_index(last_laser_scan_msg_));
+                    // TODO get parallel
                     int spin_dir = -1;
-                    if (spotted_obstacle(last_laser_scan_msg_)) {
-                        spin_dir = obstacle_dir(last_laser_scan_msg_);
-                    }
+//                    if (spotted_obstacle(last_laser_scan_msg_)) {
+//                        spin_dir = obstacle_dir(last_laser_scan_msg_);
+//                    }
                     spin(spin_dir);
                     break;
             }
