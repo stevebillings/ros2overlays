@@ -11,6 +11,10 @@ static const double DIST_WITHIN_SIGHT = 8.0;
 static const double DIST_NEAR = 3.0;
 static const double SPEED_DIVISOR_FOR_SPIN_YAW = 4.0;
 static const double MAX_SECS_TO_HOPE_FOR_REDISCOVERY = 2.0;
+
+static const unsigned long index_delta_close_to_straight_ahead = 30;
+static const unsigned long index_delta_straight_ahead = 5;
+
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
@@ -96,12 +100,11 @@ class ObstacleHuggingNode : public rclcpp::Node {
         // returns -1 (obstacle is on right), 0 (obstacle is straight-ish ahead), or +1 (obstacle is on left)
         int obstacle_dir(sensor_msgs::msg::LaserScan::SharedPtr msg) {
             unsigned long index_dead_ahead = msg->ranges.size() / 2;
-            unsigned long index_slop = 5;
             unsigned long min_range_index = get_min_range_index(msg);
-            if (min_range_index < (index_dead_ahead - index_slop)) {
+            if (min_range_index < (index_dead_ahead - index_delta_straight_ahead)) {
                 RCLCPP_INFO(get_logger(), "Obstacle is on the right");
                 return -1; // right
-            } else if (min_range_index > (index_dead_ahead + index_slop)) {
+            } else if (min_range_index > (index_dead_ahead + index_delta_straight_ahead)) {
                 RCLCPP_INFO(get_logger(), "Obstacle is on the left");
                 return 1; // left
             } else {
@@ -150,26 +153,36 @@ class ObstacleHuggingNode : public rclcpp::Node {
         }
 
         int calc_spin_velo_mult_near(sensor_msgs::msg::LaserScan::SharedPtr msg) {
-            unsigned long index_ninety_degrees = 0; // TODO certainly not right
+            unsigned long index_ninety_degrees = index_delta_close_to_straight_ahead / 2;
             return calc_spin_velo_mult(msg, index_ninety_degrees);
         }
 
         int calc_spin_velo_mult(sensor_msgs::msg::LaserScan::SharedPtr msg, unsigned long target_dir_index) {
                 // TODO: smooth this out using a single equation
-            unsigned long index_slop = 30;
+
             if (!spotted_obstacle(msg)) {
                 return 10;
             }
             unsigned long min_range_index = get_min_range_index(msg);
-            if (min_range_index < (target_dir_index - index_slop)) {
+            RCLCPP_INFO(get_logger(), "===> Obstacle found at index %ld; target_dir_index: %ld",
+                        min_range_index, target_dir_index);
+
+            RCLCPP_INFO(get_logger(), "Comparing index %ld to limit %ld", min_range_index,
+                        (target_dir_index - index_delta_close_to_straight_ahead));
+
+            if ((min_range_index > (target_dir_index - index_delta_straight_ahead))
+                && (min_range_index < (target_dir_index + index_delta_straight_ahead))) {
+                RCLCPP_INFO(get_logger(), "Obstacle is very close to the target_dir_index %ld", target_dir_index);
+                return 0; // dead ahead
+            } else if (min_range_index < (target_dir_index - index_delta_close_to_straight_ahead)) {
                 RCLCPP_INFO(get_logger(), "Obstacle is far right of the target index %ld", target_dir_index);
                 return 2; // in sight on right
-            } else if (min_range_index > (target_dir_index + index_slop)) {
+            } else if (min_range_index > (target_dir_index + index_delta_close_to_straight_ahead)) {
                 RCLCPP_INFO(get_logger(), "Obstacle is far left of the target index %ld", target_dir_index);
                 return 2; // in sight on left
             } else {
-                RCLCPP_INFO(get_logger(), "Obstacle is close to at the target_dir_index %ld", target_dir_index);
-                return 1; // ahead
+                RCLCPP_INFO(get_logger(), "Obstacle is getting close to the target_dir_index %ld", target_dir_index);
+                return 1; // getting close to, but not at, dead ahead
             }
         }
 
