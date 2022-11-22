@@ -1,6 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include "LaserAnalyzer.h"
 
 static const int STATE_SEARCH = 0;
 static const int STATE_OBSTACLE_AHEAD_FAR = 1;
@@ -41,6 +42,12 @@ class ObstacleHuggingNode : public rclcpp::Node {
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
+            LaserAnalysis laserAnalysis = laserAnalyzer_.analyze(last_laser_scan_msg_);
+            RCLCPP_INFO(get_logger(), "min_range_index: %ld; range: %lf; leftmost index: %ld",
+                        laserAnalysis.get_min_range_index(),
+                        laserAnalysis.get_min_range(),
+                        laserAnalysis.get_leftmost_index());
+            return;
             switch (state_) {
                 case STATE_SEARCH:
                     if (spotted_obstacle(last_laser_scan_msg_) && obstacle_dir(last_laser_scan_msg_) == 0) {
@@ -214,7 +221,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         rclcpp::Time state_start_time;
-
+        LaserAnalyzer laserAnalyzer_;
         int state_;
 
 };
