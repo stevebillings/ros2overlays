@@ -17,5 +17,9 @@ LaserAnalysis LaserAnalyzer::analyze(sensor_msgs::msg::LaserScan::SharedPtr msg)
     bool in_sight = min_range < DIST_WITHIN_SIGHT;
     bool near = min_range < DIST_NEAR;
     unsigned long leftmost_index = msg->ranges.size() - 1;
-    return LaserAnalysis(min_range_index, min_range, in_sight, near, leftmost_index);
+    bool to_right = min_range_index < index_dead_ahead;
+    unsigned long delta_from_perpendicular_right = min_range_index;
+    unsigned long delta_from_perpendicular_left = leftmost_index - min_range_index;
+    return LaserAnalysis(min_range_index, min_range, in_sight, near, leftmost_index, to_right,
+                         delta_from_perpendicular_right, delta_from_perpendicular_left);
 }

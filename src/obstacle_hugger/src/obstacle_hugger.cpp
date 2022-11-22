@@ -47,6 +47,11 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         laserAnalysis.get_min_range_index(),
                         laserAnalysis.get_min_range(),
                         laserAnalysis.get_leftmost_index());
+            if (laserAnalysis.is_to_right()) {
+                RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular right", laserAnalysis.get_delta_from_perpendicular_right());
+            } else {
+                RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular left", laserAnalysis.get_delta_from_perpendicular_left());
+            }
             return;
             switch (state_) {
                 case STATE_SEARCH:
