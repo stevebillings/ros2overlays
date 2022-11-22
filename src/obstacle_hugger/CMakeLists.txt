@@ -12,7 +12,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(obstacle_hugger src/obstacle_hugger.cpp src/LaserAnalyzer.cpp src/LaserAnalyzer.h src/LaserAnalysis.cpp src/LaserAnalysis.h)
+add_executable(obstacle_hugger src/obstacle_hugger.cpp src/LaserAnalyzer.cpp src/LaserAnalyzer.h src/LaserAnalysis.cpp src/LaserAnalysis.h src/Velocity.cpp src/Velocity.h src/VelocityCalculator.cpp src/VelocityCalculator.h)
 ament_target_dependencies(obstacle_hugger rclcpp sensor_msgs)
 
 if(BUILD_TESTING)

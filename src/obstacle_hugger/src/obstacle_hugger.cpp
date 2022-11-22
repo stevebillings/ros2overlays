@@ -2,6 +2,8 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "LaserAnalyzer.h"
+#include "LaserAnalysis.h"
+#include "VelocityCalculator.h"
 
 static const int STATE_SEARCH = 0;
 static const int STATE_OBSTACLE_AHEAD_FAR = 1;
@@ -52,9 +54,22 @@ class ObstacleHuggingNode : public rclcpp::Node {
             } else {
                 RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular left", laserAnalysis.get_delta_from_perpendicular_left());
             }
-            return;
+            VelocityCalculator velocityCalculator = VelocityCalculator();
+
+            Velocity approachVelocity = velocityCalculator.toApproach(laserAnalysis);
+            RCLCPP_INFO(get_logger(), "x: %lf; yaw: %lf", approachVelocity.get_forward(), approachVelocity.get_yaw());
+
+            Velocity parallelVelocity = velocityCalculator.toApproach(laserAnalysis);
+            RCLCPP_INFO(get_logger(), "x: %lf; yaw: %lf", parallelVelocity.get_forward(), parallelVelocity.get_yaw());
+
             switch (state_) {
                 case STATE_SEARCH:
+                    if (laserAnalysis.is_in_sight()) {
+                        set_velocity(approachVelocity);
+                    } else {
+                        RCLCPP_WARN(get_logger(), "Obstacle is no within sight");
+                    }
+                    break;
                     if (spotted_obstacle(last_laser_scan_msg_) && obstacle_dir(last_laser_scan_msg_) == 0) {
                         RCLCPP_INFO(get_logger(), "* Obstacle is within sight and straight ahead");
                         if (obstacle_near(last_laser_scan_msg_)) {
@@ -212,6 +227,14 @@ class ObstacleHuggingNode : public rclcpp::Node {
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = 0.0;
             drive_message.angular.z = 0.0;
+            drive_publisher_->publish(drive_message);
+        }
+
+        void set_velocity(Velocity velocity) {
+            RCLCPP_INFO(get_logger(), "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
+            geometry_msgs::msg::Twist drive_message;
+            drive_message.linear.x = velocity.get_forward();
+            drive_message.angular.z = velocity.get_yaw();
             drive_publisher_->publish(drive_message);
         }
 

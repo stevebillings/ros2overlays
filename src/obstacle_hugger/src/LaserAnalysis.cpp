@@ -6,6 +6,7 @@
 
 LaserAnalysis::LaserAnalysis(unsigned long min_range_index, double min_range, bool in_sight, bool near,
                              unsigned long leftmost_index,
+                             unsigned long straight_index,
                              bool to_right,
                              unsigned long delta_from_perpendicular_right,
                              unsigned long delta_from_perpendicular_left) {
@@ -14,6 +15,7 @@ LaserAnalysis::LaserAnalysis(unsigned long min_range_index, double min_range, bo
     in_sight_ = in_sight;
     near_ = near;
     leftmost_index_ = leftmost_index;
+    straight_index_ = straight_index;
     to_right_ = to_right;
     delta_from_perpendicular_right_ = delta_from_perpendicular_right;
     delta_from_perpendicular_left_ = delta_from_perpendicular_left;
@@ -35,6 +37,10 @@ bool LaserAnalysis::is_near() {
 
 unsigned long LaserAnalysis::get_leftmost_index() {
     return leftmost_index_;
+}
+
+unsigned long LaserAnalysis::get_straight_index() {
+    return straight_index_;
 }
 
 bool LaserAnalysis::is_to_right() {
