@@ -4,7 +4,7 @@
 
 #include "LaserAnalysis.h"
 
-LaserAnalysis::LaserAnalysis(unsigned long min_range_index, double min_range, bool in_sight, bool near,
+LaserAnalysis::LaserAnalysis(unsigned long min_range_index, double min_range, bool in_sight, bool near, bool too_near,
                              unsigned long leftmost_index,
                              unsigned long straight_index,
                              bool to_right,
@@ -14,6 +14,7 @@ LaserAnalysis::LaserAnalysis(unsigned long min_range_index, double min_range, bo
     min_range_ = min_range;
     in_sight_ = in_sight;
     near_ = near;
+    too_near_ = too_near;
     leftmost_index_ = leftmost_index;
     straight_index_ = straight_index;
     to_right_ = to_right;
@@ -33,6 +34,10 @@ bool LaserAnalysis::is_in_sight() {
 
 bool LaserAnalysis::is_near() {
     return near_;
+}
+
+bool LaserAnalysis::is_too_near() {
+    return too_near_;
 }
 
 unsigned long LaserAnalysis::get_leftmost_index() {

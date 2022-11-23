@@ -9,6 +9,14 @@ Velocity::Velocity(double forward, double yaw) {
     yaw_ = yaw;
 }
 
+Velocity Velocity::createStopped() {
+    return Velocity(0.0, 0.0);
+}
+
+Velocity Velocity::createSearchSpinRight() {
+    return Velocity(0.0, -0.1);
+}
+
 double Velocity::get_forward() {
     return forward_;
 }

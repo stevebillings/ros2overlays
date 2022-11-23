@@ -6,8 +6,7 @@
 #include "VelocityCalculator.h"
 
 static const int STATE_SEARCH = 0;
-static const int STATE_OBSTACLE_AHEAD_FAR = 1;
-static const int STATE_OBSTACLE_NEAR_NOT_PARALLEL = 2;
+static const int STATE_OBSTACLE_NEAR = 1;
 static constexpr float SPEED = 0.5;
 
 static const double DIST_WITHIN_SIGHT = 8.0;
@@ -40,7 +39,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
 
         void control_callback() {
             RCLCPP_INFO(get_logger(), "======================");
-            RCLCPP_INFO(get_logger(), "* State: %d (0 = search; 1 = ahead/far, 2 = near/not-parallel", state_);
+            RCLCPP_INFO(get_logger(), "* State: %d (0 = search; 1 = obstacle near", state_);
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
@@ -57,51 +56,33 @@ class ObstacleHuggingNode : public rclcpp::Node {
             VelocityCalculator velocityCalculator = VelocityCalculator();
 
             Velocity approachVelocity = velocityCalculator.toApproach(laserAnalysis);
-            RCLCPP_INFO(get_logger(), "x: %lf; yaw: %lf", approachVelocity.get_forward(), approachVelocity.get_yaw());
 
-            Velocity parallelVelocity = velocityCalculator.toApproach(laserAnalysis);
-            RCLCPP_INFO(get_logger(), "x: %lf; yaw: %lf", parallelVelocity.get_forward(), parallelVelocity.get_yaw());
+
+            Velocity parallelVelocity = velocityCalculator.toParallel(laserAnalysis);
+
 
             switch (state_) {
                 case STATE_SEARCH:
                     if (laserAnalysis.is_in_sight()) {
+                        RCLCPP_INFO(get_logger(), "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(), approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
-                    } else {
-                        RCLCPP_WARN(get_logger(), "Obstacle is no within sight");
-                    }
-                    break;
-                    if (spotted_obstacle(last_laser_scan_msg_) && obstacle_dir(last_laser_scan_msg_) == 0) {
-                        RCLCPP_INFO(get_logger(), "* Obstacle is within sight and straight ahead");
-                        if (obstacle_near(last_laser_scan_msg_)) {
-                            RCLCPP_INFO(get_logger(), "* Obstacle is near!");
-                            stop();
-                            set_state(STATE_OBSTACLE_NEAR_NOT_PARALLEL);
-                        } else {
-                            RCLCPP_INFO(get_logger(), "* Obstacle is within sight but not near; drive to it");
-                            drive_straight();
-                            set_state(STATE_OBSTACLE_AHEAD_FAR);
+                        if (approachVelocity.get_forward() == 0.0) {
+                            set_state(STATE_OBSTACLE_NEAR);
                         }
                     } else {
-                        RCLCPP_INFO(get_logger(), "* Obstacle is either out of sight or not yet straight ahead");
-                        spin(-1, calc_spin_velo_mult_search(last_laser_scan_msg_));
+                        RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
+                        set_velocity(Velocity::createSearchSpinRight());
                     }
                     break;
-                case STATE_OBSTACLE_AHEAD_FAR:
-                    if (obstacle_near(last_laser_scan_msg_)) {
-                        stop();
-                        set_state(STATE_OBSTACLE_NEAR_NOT_PARALLEL);
+                case STATE_OBSTACLE_NEAR:
+                    if (laserAnalysis.is_in_sight()) {
+                        RCLCPP_INFO(get_logger(), "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(), parallelVelocity.get_yaw());
+                        set_velocity(parallelVelocity);
                     } else {
-                        drive_straight();
+                        RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
+                        set_velocity(Velocity::createStopped());
+                        set_state(STATE_SEARCH);
                     }
-                    break;
-                case STATE_OBSTACLE_NEAR_NOT_PARALLEL:
-                    RCLCPP_INFO(get_logger(), "* min_range_index: %ld", get_min_range_index(last_laser_scan_msg_));
-                    // TODO get parallel
-                    int spin_dir = -1;
-//                    if (spotted_obstacle(last_laser_scan_msg_)) {
-//                        spin_dir = obstacle_dir(last_laser_scan_msg_);
-//                    }
-                    spin(spin_dir, calc_spin_velo_mult_near(last_laser_scan_msg_));
                     break;
             }
         }

@@ -9,6 +9,8 @@
 class Velocity {
 public:
     Velocity(double forward, double yaw);
+    static Velocity createStopped();
+    static Velocity createSearchSpinRight();
     double get_forward();
     double get_yaw();
 private:
