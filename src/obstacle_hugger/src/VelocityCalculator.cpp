@@ -19,11 +19,11 @@ Velocity VelocityCalculator::toApproach(LaserAnalysis laserAnalysis) {
 }
 Velocity VelocityCalculator::toParallel(LaserAnalysis laserAnalysis) {
     double yaw_delta_factor = 0.01;
-    if (laserAnalysis.is_too_near()) {
-        printf("Obstacle is too near; stopping\n");
-        return Velocity(0.0, 0.0);
-    }
-    printf("Obstacle is at a safe distance; calculating velocities to parallel it\n");
+//    if (laserAnalysis.is_too_near()) {
+//        printf("Obstacle is too near; stopping\n");
+//        return Velocity(0.0, 0.0);
+//    }
+    printf("Calculating velocities to parallel obstacle\n");
     double x = 1.0;
     double yaw;
     if (laserAnalysis.is_to_right()) {

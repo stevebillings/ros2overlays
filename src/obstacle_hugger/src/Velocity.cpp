@@ -14,7 +14,11 @@ Velocity Velocity::createStopped() {
 }
 
 Velocity Velocity::createSearchSpinRight() {
-    return Velocity(0.0, -0.1);
+    return Velocity(0.0, -0.5);
+}
+
+Velocity Velocity::createReverse() {
+    return Velocity(-0.5, 0.0);
 }
 
 double Velocity::get_forward() {

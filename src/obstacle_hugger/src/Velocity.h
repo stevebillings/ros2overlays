@@ -11,6 +11,7 @@ public:
     Velocity(double forward, double yaw);
     static Velocity createStopped();
     static Velocity createSearchSpinRight();
+    static Velocity createReverse();
     double get_forward();
     double get_yaw();
 private:

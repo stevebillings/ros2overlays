@@ -7,6 +7,7 @@
 
 static const int STATE_SEARCH = 0;
 static const int STATE_OBSTACLE_NEAR = 1;
+static const int STATE_OBSTACLE_TOO_NEAR = 2;
 static constexpr float SPEED = 0.5;
 
 static const double DIST_WITHIN_SIGHT = 8.0;
@@ -75,11 +76,21 @@ class ObstacleHuggingNode : public rclcpp::Node {
                     }
                     break;
                 case STATE_OBSTACLE_NEAR:
-                    if (laserAnalysis.is_in_sight()) {
-                        RCLCPP_INFO(get_logger(), "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(), parallelVelocity.get_yaw());
+                    if (laserAnalysis.is_too_near()) {
+                        set_velocity(Velocity::createReverse());
+                        set_state(STATE_OBSTACLE_TOO_NEAR);
+                    } else if (laserAnalysis.is_in_sight()) {
+                        RCLCPP_INFO(get_logger(), "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
+                                    parallelVelocity.get_yaw());
                         set_velocity(parallelVelocity);
                     } else {
                         RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
+                        set_velocity(Velocity::createStopped());
+                        set_state(STATE_SEARCH);
+                    }
+                    break;
+                case STATE_OBSTACLE_TOO_NEAR:
+                    if (get_seconds_in_state() > 2.0) {
                         set_velocity(Velocity::createStopped());
                         set_state(STATE_SEARCH);
                     }
