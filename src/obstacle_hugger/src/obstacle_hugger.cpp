@@ -1,13 +1,11 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include "FullState.h"
 #include "LaserAnalyzer.h"
 #include "LaserAnalysis.h"
 #include "VelocityCalculator.h"
 
-static const int STATE_SEARCH = 0;
-static const int STATE_OBSTACLE_NEAR = 1;
-static const int STATE_OBSTACLE_TOO_NEAR = 2;
 static constexpr float SPEED = 0.5;
 
 static const double DIST_WITHIN_SIGHT = 8.0;
@@ -30,7 +28,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             // TODO once working, period should be 50ms
             timer_ = create_wall_timer(50ms, std::bind(&ObstacleHuggingNode::control_callback, this));
             drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-            set_state(STATE_SEARCH);
+            set_state(State::SEARCH);
 		}
 
     private:
@@ -40,7 +38,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
 
         void control_callback() {
             RCLCPP_INFO(get_logger(), "======================");
-            RCLCPP_INFO(get_logger(), "* State: %d (0 = search; 1 = obstacle near", state_);
+            RCLCPP_INFO(get_logger(), "* State: %d (0 = search; 1 = obstacle near", state_.get_name());
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
@@ -61,24 +59,34 @@ class ObstacleHuggingNode : public rclcpp::Node {
 
             Velocity parallelVelocity = velocityCalculator.toParallel(laserAnalysis);
 
+            // TODO:
+            // Approaching: Tolerate losing sight for a while without changing state; maybe up to 1 sec? 0.5 sec?
+            // Paralleling: If lose sight: maybe go straight for 1 sec; if still lost, then -> RECENTLY_LOST
+            // RECENTLY_LOST: arc hard toward direction last saw it
+            //      New states (just lost, recently lost)?
+            // Maybe state is an object:
+            //      State
+            //      Time entered state
+            //      Last seen direction boolean
+            //      Time last seen
 
-            switch (state_) {
-                case STATE_SEARCH:
+            switch (state_.get_state()) {
+                case State::SEARCH:
                     if (laserAnalysis.is_in_sight()) {
                         RCLCPP_INFO(get_logger(), "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(), approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
                         if (approachVelocity.get_forward() == 0.0) {
-                            set_state(STATE_OBSTACLE_NEAR);
+                            set_state(State::OBSTACLE_NEAR);
                         }
                     } else {
                         RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
                         set_velocity(Velocity::createSearchSpinRight());
                     }
                     break;
-                case STATE_OBSTACLE_NEAR:
+                case State::OBSTACLE_NEAR:
                     if (laserAnalysis.is_too_near()) {
                         set_velocity(Velocity::createReverse());
-                        set_state(STATE_OBSTACLE_TOO_NEAR);
+                        set_state(State::OBSTACLE_TOO_NEAR);
                     } else if (laserAnalysis.is_in_sight()) {
                         RCLCPP_INFO(get_logger(), "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
                                     parallelVelocity.get_yaw());
@@ -86,13 +94,13 @@ class ObstacleHuggingNode : public rclcpp::Node {
                     } else {
                         RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
                         set_velocity(Velocity::createStopped());
-                        set_state(STATE_SEARCH);
+                        set_state(State::SEARCH);
                     }
                     break;
-                case STATE_OBSTACLE_TOO_NEAR:
+                case State::OBSTACLE_TOO_NEAR:
                     if (get_seconds_in_state() > 2.0) {
                         set_velocity(Velocity::createStopped());
-                        set_state(STATE_SEARCH);
+                        set_state(State::SEARCH);
                     }
                     break;
             }
@@ -230,10 +238,9 @@ class ObstacleHuggingNode : public rclcpp::Node {
             drive_publisher_->publish(drive_message);
         }
 
-        void set_state(int new_state) {
-            state_ = new_state;
-            state_start_time = now();
-            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_, state_start_time.nanoseconds());
+        void set_state(State new_state) {
+            state_.set_state(new_state, now().nanoseconds());
+            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_.get_name(), state_start_time.nanoseconds());
         }
 	private:
         rclcpp::TimerBase::SharedPtr timer_;
@@ -242,7 +249,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         rclcpp::Time state_start_time;
         LaserAnalyzer laserAnalyzer_;
-        int state_;
+        FullState state_ = FullState();
 
 };
 
