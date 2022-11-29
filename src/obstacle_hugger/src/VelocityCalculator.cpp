@@ -26,12 +26,14 @@ Velocity VelocityCalculator::toParallel(LaserAnalysis laserAnalysis) {
     printf("Calculating velocities to parallel obstacle\n");
     double x = 1.0;
     double yaw;
-    if (laserAnalysis.is_to_right()) {
-        printf("Obstacle is to the right\n");
-        yaw = laserAnalysis.get_delta_from_perpendicular_right() * yaw_delta_factor;
-    } else {
-        printf("Obstacle is to the left\n");
-        yaw = (laserAnalysis.get_delta_from_perpendicular_left()) * yaw_delta_factor * -1;
+    if (laserAnalysis.is_in_sight()) {
+        if (laserAnalysis.is_to_right()) {
+            printf("Obstacle is to the right\n");
+            yaw = laserAnalysis.get_delta_from_perpendicular_right() * yaw_delta_factor;
+        } else {
+            printf("Obstacle is to the left\n");
+            yaw = (laserAnalysis.get_delta_from_perpendicular_left()) * yaw_delta_factor * -1;
+        }
     }
     printf("Calculated velocities: x: %lf; yaw: %lf\n", x, yaw);
     return Velocity(x, yaw);

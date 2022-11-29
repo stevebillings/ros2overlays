@@ -38,7 +38,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
 
         void control_callback() {
             RCLCPP_INFO(get_logger(), "======================");
-            RCLCPP_INFO(get_logger(), "* State: %d (0 = search; 1 = obstacle near", state_.get_name());
+            RCLCPP_INFO(get_logger(), "* State: %s", state_.get_name());
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
@@ -47,10 +47,16 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         laserAnalysis.get_min_range_index(),
                         laserAnalysis.get_min_range(),
                         laserAnalysis.get_leftmost_index());
-            if (laserAnalysis.is_to_right()) {
-                RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular right", laserAnalysis.get_delta_from_perpendicular_right());
-            } else {
-                RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular left", laserAnalysis.get_delta_from_perpendicular_left());
+            if (laserAnalysis.is_in_sight()) {
+                set_obstacle_seen(laserAnalysis.is_to_right());
+                // TODO analysis class should have some sort of toString() to do this
+                if (laserAnalysis.is_to_right()) {
+                    RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular right",
+                                laserAnalysis.get_delta_from_perpendicular_right());
+                } else {
+                    RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular left",
+                                laserAnalysis.get_delta_from_perpendicular_left());
+                }
             }
             VelocityCalculator velocityCalculator = VelocityCalculator();
 
@@ -92,9 +98,17 @@ class ObstacleHuggingNode : public rclcpp::Node {
                                     parallelVelocity.get_yaw());
                         set_velocity(parallelVelocity);
                     } else {
-                        RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
-                        set_velocity(Velocity::createStopped());
-                        set_state(State::SEARCH);
+                        // Lost sight of obstacle
+                        double time_lost = now().seconds() - state_.get_obstacle_last_seen_time();
+                        RCLCPP_INFO(get_logger(), "Lost sight of obstacle %lf seconds ago", time_lost);
+                        if (time_lost < 1.0) {
+                            RCLCPP_INFO(get_logger(), "Lost sight of obstacle, but it's only been %lf seconds, so being patient...",
+                                        time_lost);
+                        } else {
+                            RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
+                            set_velocity(Velocity::createStopped());
+                            set_state(State::SEARCH);
+                        }
                     }
                     break;
                 case State::OBSTACLE_TOO_NEAR:
@@ -107,9 +121,8 @@ class ObstacleHuggingNode : public rclcpp::Node {
         }
 
         double get_seconds_in_state() {
-            rclcpp::Time right_now = now();
-            rclcpp::Duration time_in_state = right_now - state_start_time;
-            double seconds_in_state = time_in_state.seconds();
+            double right_now = now().seconds();
+            double seconds_in_state = right_now - state_.get_state_start_time();
             RCLCPP_INFO(get_logger(), "Seconds since entered current state: %lf", seconds_in_state);
             return seconds_in_state;
         }
@@ -239,15 +252,17 @@ class ObstacleHuggingNode : public rclcpp::Node {
         }
 
         void set_state(State new_state) {
-            state_.set_state(new_state, now().nanoseconds());
-            RCLCPP_INFO(get_logger(), "Entering state %d at nanoseconds %ld", state_.get_name(), state_start_time.nanoseconds());
+            state_.set_state(new_state, now().seconds());
+            RCLCPP_INFO(get_logger(), "New State: %s", state_.get_name());
+        }
+        void set_obstacle_seen(bool seen_to_right) {
+            state_.set_obstacle_last_seen_time(now().seconds(), seen_to_right);
         }
 	private:
         rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
-        rclcpp::Time state_start_time;
         LaserAnalyzer laserAnalyzer_;
         FullState state_ = FullState();
 
