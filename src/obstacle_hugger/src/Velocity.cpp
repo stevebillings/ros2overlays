@@ -22,7 +22,7 @@ Velocity Velocity::createSearchSpinLeft() {
 }
 
 Velocity Velocity::createReverse() {
-    return Velocity(-0.5, 0.0);
+    return Velocity(-1.0, 0.0);
 }
 
 double Velocity::get_forward() {

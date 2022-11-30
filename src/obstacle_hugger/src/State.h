@@ -9,8 +9,7 @@
 enum State {
     SEARCH,
     OBSTACLE_NEAR,
-    OBSTACLE_TOO_NEAR,
-    RECENTLY_LOST
+    OBSTACLE_TOO_NEAR
 };
 
 

@@ -24,8 +24,6 @@ const char *FullState::get_name() {
             return "OBSTACLE_NEAR";
         case OBSTACLE_TOO_NEAR:
             return "OBSTACLE_TOO_NEAR";
-        case RECENTLY_LOST:
-            return "RECENTLY_LOST";
         default:
             return "UNRECOGNIZED";
     }
