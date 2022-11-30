@@ -17,6 +17,10 @@ Velocity Velocity::createSearchSpinRight() {
     return Velocity(0.0, -0.5);
 }
 
+Velocity Velocity::createSearchSpinLeft() {
+    return Velocity(0.0, 0.5);
+}
+
 Velocity Velocity::createReverse() {
     return Velocity(-0.5, 0.0);
 }

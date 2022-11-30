@@ -37,13 +37,13 @@ class ObstacleHuggingNode : public rclcpp::Node {
         }
 
         void control_callback() {
-            RCLCPP_INFO(get_logger(), "======================");
-            RCLCPP_INFO(get_logger(), "* State: %s", state_.get_name());
+            RCLCPP_INFO(logger_, "======================");
+            RCLCPP_INFO(logger_, "* State: %s", state_.get_name());
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
             LaserAnalysis laserAnalysis = laserAnalyzer_.analyze(last_laser_scan_msg_);
-            RCLCPP_INFO(get_logger(), "min_range_index: %ld; range: %lf; leftmost index: %ld",
+            RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
                         laserAnalysis.get_min_range_index(),
                         laserAnalysis.get_min_range(),
                         laserAnalysis.get_leftmost_index());
@@ -51,19 +51,19 @@ class ObstacleHuggingNode : public rclcpp::Node {
                 set_obstacle_seen(laserAnalysis.is_to_right());
                 // TODO analysis class should have some sort of toString() to do this
                 if (laserAnalysis.is_to_right()) {
-                    RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular right",
+                    RCLCPP_INFO(logger_, "%ld increments away from perpendicular right",
                                 laserAnalysis.get_delta_from_perpendicular_right());
                 } else {
-                    RCLCPP_INFO(get_logger(), "%ld increments away from perpendicular left",
+                    RCLCPP_INFO(logger_, "%ld increments away from perpendicular left",
                                 laserAnalysis.get_delta_from_perpendicular_left());
                 }
             }
             VelocityCalculator velocityCalculator = VelocityCalculator();
 
-            Velocity approachVelocity = velocityCalculator.toApproach(laserAnalysis);
+            Velocity approachVelocity = velocityCalculator.toApproach(logger_, laserAnalysis);
 
 
-            Velocity parallelVelocity = velocityCalculator.toParallel(laserAnalysis);
+            Velocity parallelVelocity = velocityCalculator.toParallel(logger_, laserAnalysis);
 
             // TODO:
             // Approaching: Tolerate losing sight for a while without changing state; maybe up to 1 sec? 0.5 sec?
@@ -76,17 +76,34 @@ class ObstacleHuggingNode : public rclcpp::Node {
             //      Last seen direction boolean
             //      Time last seen
 
+            double time_lost = 0.0;
+            if (state_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight()) {
+                time_lost = now().seconds() - state_.get_obstacle_last_seen_time();
+            }
+
             switch (state_.get_state()) {
                 case State::SEARCH:
                     if (laserAnalysis.is_in_sight()) {
-                        RCLCPP_INFO(get_logger(), "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(), approachVelocity.get_yaw());
+                        RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(),
+                                    approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
                         if (approachVelocity.get_forward() == 0.0) {
                             set_state(State::OBSTACLE_NEAR);
                         }
+                    } else if (state_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight() && time_lost > 1.0) {
+                        RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than a second");
+                        if (state_.was_obstacle_last_seen_to_right()) {
+                            set_velocity(Velocity::createSearchSpinRight());
+                        } else {
+                            set_velocity(Velocity::createSearchSpinLeft());
+                        }
                     } else {
-                        RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
-                        set_velocity(Velocity::createSearchSpinRight());
+                        RCLCPP_WARN(logger_, "Obstacle is not within sight");
+                        if (state_.has_obstacle_been_seen() && state_.was_obstacle_last_seen_to_right()) {
+                            set_velocity(Velocity::createSearchSpinRight());
+                        } else {
+                            set_velocity(Velocity::createSearchSpinLeft());
+                        }
                     }
                     break;
                 case State::OBSTACLE_NEAR:
@@ -94,18 +111,18 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         set_velocity(Velocity::createReverse());
                         set_state(State::OBSTACLE_TOO_NEAR);
                     } else if (laserAnalysis.is_in_sight()) {
-                        RCLCPP_INFO(get_logger(), "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
+                        RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
                                     parallelVelocity.get_yaw());
                         set_velocity(parallelVelocity);
                     } else {
                         // Lost sight of obstacle
-                        double time_lost = now().seconds() - state_.get_obstacle_last_seen_time();
-                        RCLCPP_INFO(get_logger(), "Lost sight of obstacle %lf seconds ago", time_lost);
+
+                        RCLCPP_INFO(logger_, "Lost sight of obstacle %lf seconds ago", time_lost);
                         if (time_lost < 1.0) {
-                            RCLCPP_INFO(get_logger(), "Lost sight of obstacle, but it's only been %lf seconds, so being patient...",
+                            RCLCPP_INFO(logger_, "Lost sight of obstacle, but it's only been %lf seconds, so being patient...",
                                         time_lost);
                         } else {
-                            RCLCPP_WARN(get_logger(), "Obstacle is not within sight");
+                            RCLCPP_WARN(logger_, "Obstacle is not within sight");
                             set_velocity(Velocity::createStopped());
                             set_state(State::SEARCH);
                         }
@@ -123,7 +140,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         double get_seconds_in_state() {
             double right_now = now().seconds();
             double seconds_in_state = right_now - state_.get_state_start_time();
-            RCLCPP_INFO(get_logger(), "Seconds since entered current state: %lf", seconds_in_state);
+            RCLCPP_INFO(logger_, "Seconds since entered current state: %lf", seconds_in_state);
             return seconds_in_state;
         }
 
@@ -131,7 +148,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             unsigned long min_range_index = get_min_range_index(msg);
             double min_range = msg->ranges[min_range_index];
             if (min_range < DIST_WITHIN_SIGHT) {
-                RCLCPP_INFO(get_logger(), "Obstacle is within sight (range index: %ld)", min_range_index);
+                RCLCPP_INFO(logger_, "Obstacle is within sight (range index: %ld)", min_range_index);
                 return true;
             }
             return false;
@@ -142,13 +159,13 @@ class ObstacleHuggingNode : public rclcpp::Node {
             unsigned long index_dead_ahead = msg->ranges.size() / 2;
             unsigned long min_range_index = get_min_range_index(msg);
             if (min_range_index < (index_dead_ahead - index_delta_straight_ahead)) {
-                RCLCPP_INFO(get_logger(), "Obstacle is on the right");
+                RCLCPP_INFO(logger_, "Obstacle is on the right");
                 return -1; // right
             } else if (min_range_index > (index_dead_ahead + index_delta_straight_ahead)) {
-                RCLCPP_INFO(get_logger(), "Obstacle is on the left");
+                RCLCPP_INFO(logger_, "Obstacle is on the left");
                 return 1; // left
             } else {
-                RCLCPP_INFO(get_logger(), "Obstacle is straight ahead");
+                RCLCPP_INFO(logger_, "Obstacle is straight ahead");
                 return 0; // ahead
             }
         }
@@ -157,7 +174,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             unsigned long min_range_index = get_min_range_index(msg);
             double min_range = msg->ranges[min_range_index];
             if (min_range < DIST_NEAR) {
-                RCLCPP_INFO(get_logger(), "Obstacle is dangerously close");
+                RCLCPP_INFO(logger_, "Obstacle is dangerously close");
                 return true;
             }
             return false;
@@ -175,12 +192,12 @@ class ObstacleHuggingNode : public rclcpp::Node {
                 }
                 cur_range_index++;
             }
-            RCLCPP_INFO(get_logger(), "Spotted obstacle at range %lf at index %ld", min_range, min_range_index);
+            RCLCPP_INFO(logger_, "Spotted obstacle at range %lf at index %ld", min_range, min_range_index);
             return min_range_index;
         }
 
         void drive_straight() {
-            RCLCPP_INFO(get_logger(), "Driving straight ahead");
+            RCLCPP_INFO(logger_, "Driving straight ahead");
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = SPEED; // ahead
             drive_message.angular.z = 0.0;
@@ -204,24 +221,24 @@ class ObstacleHuggingNode : public rclcpp::Node {
                 return 10;
             }
             unsigned long min_range_index = get_min_range_index(msg);
-            RCLCPP_INFO(get_logger(), "===> Obstacle found at index %ld; target_dir_index: %ld",
+            RCLCPP_INFO(logger_, "===> Obstacle found at index %ld; target_dir_index: %ld",
                         min_range_index, target_dir_index);
 
-            RCLCPP_INFO(get_logger(), "Comparing index %ld to limit %ld", min_range_index,
+            RCLCPP_INFO(logger_, "Comparing index %ld to limit %ld", min_range_index,
                         (target_dir_index - index_delta_close_to_straight_ahead));
 
             if ((min_range_index > (target_dir_index - index_delta_straight_ahead))
                 && (min_range_index < (target_dir_index + index_delta_straight_ahead))) {
-                RCLCPP_INFO(get_logger(), "Obstacle is very close to the target_dir_index %ld", target_dir_index);
+                RCLCPP_INFO(logger_, "Obstacle is very close to the target_dir_index %ld", target_dir_index);
                 return 0; // dead ahead
             } else if (min_range_index < (target_dir_index - index_delta_close_to_straight_ahead)) {
-                RCLCPP_INFO(get_logger(), "Obstacle is far right of the target index %ld", target_dir_index);
+                RCLCPP_INFO(logger_, "Obstacle is far right of the target index %ld", target_dir_index);
                 return 2; // in sight on right
             } else if (min_range_index > (target_dir_index + index_delta_close_to_straight_ahead)) {
-                RCLCPP_INFO(get_logger(), "Obstacle is far left of the target index %ld", target_dir_index);
+                RCLCPP_INFO(logger_, "Obstacle is far left of the target index %ld", target_dir_index);
                 return 2; // in sight on left
             } else {
-                RCLCPP_INFO(get_logger(), "Obstacle is getting close to the target_dir_index %ld", target_dir_index);
+                RCLCPP_INFO(logger_, "Obstacle is getting close to the target_dir_index %ld", target_dir_index);
                 return 1; // getting close to, but not at, dead ahead
             }
         }
@@ -231,12 +248,12 @@ class ObstacleHuggingNode : public rclcpp::Node {
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = 0.0;
             drive_message.angular.z = yaw; // yaw
-            RCLCPP_INFO(get_logger(), "Spinning with spin_dir %d; yaw %f", spin_dir, yaw);
+            RCLCPP_INFO(logger_, "Spinning with spin_dir %d; yaw %f", spin_dir, yaw);
             drive_publisher_->publish(drive_message);
         }
 
         void stop() {
-            RCLCPP_INFO(get_logger(), "Stopping");
+            RCLCPP_INFO(logger_, "Stopping");
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = 0.0;
             drive_message.angular.z = 0.0;
@@ -244,7 +261,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         }
 
         void set_velocity(Velocity velocity) {
-            RCLCPP_INFO(get_logger(), "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
+            RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = velocity.get_forward();
             drive_message.angular.z = velocity.get_yaw();
@@ -253,10 +270,10 @@ class ObstacleHuggingNode : public rclcpp::Node {
 
         void set_state(State new_state) {
             state_.set_state(new_state, now().seconds());
-            RCLCPP_INFO(get_logger(), "New State: %s", state_.get_name());
+            RCLCPP_INFO(logger_, "New State: %s", state_.get_name());
         }
         void set_obstacle_seen(bool seen_to_right) {
-            state_.set_obstacle_last_seen_time(now().seconds(), seen_to_right);
+            state_.set_obstacle_last_seen_time(logger_, now().seconds(), seen_to_right);
         }
 	private:
         rclcpp::TimerBase::SharedPtr timer_;
@@ -265,7 +282,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
         LaserAnalyzer laserAnalyzer_;
         FullState state_ = FullState();
-
+        rclcpp::Logger logger_ = get_logger();
 };
 
 int main(int argc, char * argv[])

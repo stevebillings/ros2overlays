@@ -1,12 +1,12 @@
-#include <stdio.h>
+
 #include "FullState.h"
 
 void FullState::set_state(State new_state, double state_start_time) {
     state_ = new_state;
     state_start_time_ = state_start_time;
 }
-void FullState::set_obstacle_last_seen_time(double obstacle_last_seen_time, bool seen_to_right) {
-    printf("Obstacle seen at %lf\n", obstacle_last_seen_time);
+void FullState::set_obstacle_last_seen_time(rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right) {
+    RCLCPP_INFO(logger, "Obstacle seen at time %lf\n", obstacle_last_seen_time);
     obstacle_has_been_seen_ = true;
     obstacle_last_seen_time_ = obstacle_last_seen_time;
     obstacle_last_seen_to_right_ = seen_to_right;

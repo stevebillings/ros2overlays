@@ -2,12 +2,14 @@
 #ifndef OBSTACLE_HUGGER_FULLSTATE_H
 #define OBSTACLE_HUGGER_FULLSTATE_H
 
+#include <rclcpp/logger.hpp>
+#include <rclcpp/logging.hpp>
 #include "State.h"
 
 class FullState {
 public:
     void set_state(State new_state, double state_start_time);
-    void set_obstacle_last_seen_time(double obstacle_last_seen_time, bool seen_to_right);
+    void set_obstacle_last_seen_time(rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right);
     State get_state();
     const char *get_name();
     double get_state_start_time();
