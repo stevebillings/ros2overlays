@@ -1,8 +1,8 @@
 
 #include "FullState.h"
 
-void FullState::set_state(State new_state, double state_start_time) {
-    state_ = new_state;
+void FullState::set_state(FsmState new_state, double state_start_time) {
+    fsm_state_ = new_state;
     state_start_time_ = state_start_time;
 }
 void FullState::set_obstacle_last_seen_time(rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right) {
@@ -12,12 +12,12 @@ void FullState::set_obstacle_last_seen_time(rclcpp::Logger& logger, double obsta
     obstacle_last_seen_to_right_ = seen_to_right;
 }
 
-State FullState::get_state() {
-    return state_;
+FsmState FullState::get_fsm_state() {
+    return fsm_state_;
 }
 
-const char *FullState::get_name() {
-    switch (state_) {
+const char *FullState::get_fsm_state_name() {
+    switch (fsm_state_) {
         case SEARCH:
             return "SEARCH";
         case OBSTACLE_NEAR:
