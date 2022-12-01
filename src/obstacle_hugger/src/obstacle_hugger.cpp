@@ -47,7 +47,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
                                 laserAnalysis.get_delta_from_perpendicular_left());
                 }
             }
-            VelocityCalculator velocityCalculator = VelocityCalculator();
+
 
 
             double time_lost = 0.0;
@@ -58,7 +58,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             switch (fullState_.get_fsm_state()) {
                 case FsmState::SEARCH:
                     if (laserAnalysis.is_in_sight()) {
-                        Velocity approachVelocity = velocityCalculator.toApproach(logger_, laserAnalysis);
+                        Velocity approachVelocity = velocityCalculator_.toApproach(logger_, laserAnalysis);
                         RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(),
                                     approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
@@ -86,7 +86,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         set_velocity(Velocity::createReverse());
                         set_state(FsmState::OBSTACLE_TOO_NEAR);
                     } else if (laserAnalysis.is_in_sight()) {
-                        Velocity parallelVelocity = velocityCalculator.toParallel(logger_, laserAnalysis);
+                        Velocity parallelVelocity = velocityCalculator_.toParallel(logger_, laserAnalysis);
                         RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
                                     parallelVelocity.get_yaw());
                         set_velocity(parallelVelocity);
@@ -140,6 +140,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         LaserAnalyzer laserAnalyzer_;
         FullState fullState_ = FullState();
         rclcpp::Logger logger_ = get_logger();
+        VelocityCalculator velocityCalculator_ = VelocityCalculator();
 };
 
 int main(int argc, char * argv[])
