@@ -20,16 +20,16 @@ public:
     LaserAnalysis(unsigned long min_range_index, double min_range, bool in_sight, bool near, bool too_near, unsigned long leftmost_index,
                   unsigned long straight_index,
                   bool to_right, unsigned long delta_from_perpendicular_right, unsigned long delta_from_perpendicular_left);
-    unsigned long get_min_range_index();
-    double get_min_range();
-    bool is_in_sight();
-    bool is_near();
-    bool is_too_near();
-    unsigned long get_leftmost_index();
-    unsigned long get_straight_index();
-    bool is_to_right();
-    unsigned long get_delta_from_perpendicular_right();
-    unsigned long get_delta_from_perpendicular_left();
+    unsigned long get_min_range_index() const;
+    double get_min_range() const;
+    bool is_in_sight() const;
+    bool is_near() const;
+    bool is_too_near() const;
+    unsigned long get_leftmost_index() const;
+    unsigned long get_straight_index() const;
+    bool is_to_right() const;
+    unsigned long get_delta_from_perpendicular_right() const;
+    unsigned long get_delta_from_perpendicular_left() const;
 };
 
 #endif //OBSTACLE_HUGGER_LASERANALYSIS_H

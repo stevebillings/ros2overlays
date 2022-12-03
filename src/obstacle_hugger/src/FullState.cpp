@@ -12,11 +12,11 @@ void FullState::set_obstacle_last_seen_time(rclcpp::Logger& logger, double obsta
     obstacle_last_seen_to_right_ = seen_to_right;
 }
 
-FsmState FullState::get_fsm_state() {
+FsmState FullState::get_fsm_state() const {
     return fsm_state_;
 }
 
-const char *FullState::get_fsm_state_name() {
+const char *FullState::get_fsm_state_name() const {
     switch (fsm_state_) {
         case SEARCH:
             return "SEARCH";
@@ -29,16 +29,16 @@ const char *FullState::get_fsm_state_name() {
     }
 }
 
-bool FullState::has_obstacle_been_seen() {
+bool FullState::has_obstacle_been_seen() const {
     return obstacle_has_been_seen_;
 }
-double FullState::get_obstacle_last_seen_time() {
+double FullState::get_obstacle_last_seen_time() const {
     return obstacle_last_seen_time_;
 }
-bool FullState::was_obstacle_last_seen_to_right() {
+bool FullState::was_obstacle_last_seen_to_right() const {
     return obstacle_last_seen_to_right_;
 }
 
-double FullState::get_state_start_time() {
+double FullState::get_state_start_time() const {
     return state_start_time_;
 }

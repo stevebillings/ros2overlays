@@ -117,7 +117,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             return seconds_in_state;
         }
 
-        void set_velocity(Velocity velocity) {
+        void set_velocity(const Velocity &velocity) {
             RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = velocity.get_forward();

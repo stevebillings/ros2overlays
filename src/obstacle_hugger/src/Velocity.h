@@ -14,8 +14,8 @@ public:
     static Velocity createSearchSpinRight();
     static Velocity createSearchSpinLeft();
     static Velocity createReverse();
-    double get_forward();
-    double get_yaw();
+    double get_forward() const;
+    double get_yaw() const;
 private:
     double forward_;
     double yaw_;
