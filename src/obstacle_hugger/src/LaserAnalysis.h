@@ -5,7 +5,7 @@
 class LaserAnalysis {
 
 private:
-    unsigned long min_range_index_;
+    const unsigned long min_range_index_;
     double min_range_;
     bool in_sight_;
     bool near_;
@@ -17,9 +17,21 @@ private:
     unsigned long delta_from_perpendicular_left_;
 
 public:
-    LaserAnalysis(unsigned long min_range_index, double min_range, bool in_sight, bool near, bool too_near, unsigned long leftmost_index,
-                  unsigned long straight_index,
-                  bool to_right, unsigned long delta_from_perpendicular_right, unsigned long delta_from_perpendicular_left);
+    LaserAnalysis(const unsigned long min_range_index, const double min_range, const bool in_sight, const bool near, const bool too_near,
+                                 const unsigned long leftmost_index,
+                                 const unsigned long straight_index,
+                                 const bool to_right,
+                                 const unsigned long delta_from_perpendicular_right,
+                                 const unsigned long delta_from_perpendicular_left) : min_range_index_(min_range_index)
+            , min_range_(min_range)
+            , in_sight_(in_sight)
+            , near_(near)
+            , too_near_(too_near)
+            , leftmost_index_(leftmost_index)
+            , straight_index_(straight_index)
+            , to_right_(to_right)
+            , delta_from_perpendicular_right_(delta_from_perpendicular_right)
+            , delta_from_perpendicular_left_(delta_from_perpendicular_left) {};
     unsigned long get_min_range_index() const;
     double get_min_range() const;
     bool is_in_sight() const;
