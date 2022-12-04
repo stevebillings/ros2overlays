@@ -1,7 +1,5 @@
 #include "LaserAnalyzer.h"
 
-LaserAnalyzer::LaserAnalyzer() {}
-
 LaserAnalysis LaserAnalyzer::analyze(sensor_msgs::msg::LaserScan::SharedPtr msg) {
     unsigned long straight_index = msg->ranges.size() / 2;
     int cur_range_index = 0;

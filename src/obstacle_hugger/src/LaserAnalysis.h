@@ -4,17 +4,6 @@
 
 class LaserAnalysis {
 
-private:
-    const unsigned long min_range_index_;
-    double min_range_;
-    bool in_sight_;
-    bool near_;
-    bool too_near_;
-    unsigned long leftmost_index_;
-    unsigned long straight_index_;
-    bool to_right_;
-    unsigned long delta_from_perpendicular_right_;
-    unsigned long delta_from_perpendicular_left_;
 
 public:
     LaserAnalysis(const unsigned long min_range_index, const double min_range, const bool in_sight, const bool near, const bool too_near,
@@ -42,6 +31,18 @@ public:
     bool is_to_right() const;
     unsigned long get_delta_from_perpendicular_right() const;
     unsigned long get_delta_from_perpendicular_left() const;
+
+private:
+    const unsigned long min_range_index_;
+    double min_range_;
+    bool in_sight_;
+    bool near_;
+    bool too_near_;
+    unsigned long leftmost_index_;
+    unsigned long straight_index_;
+    bool to_right_;
+    unsigned long delta_from_perpendicular_right_;
+    unsigned long delta_from_perpendicular_left_;
 };
 
 #endif //OBSTACLE_HUGGER_LASERANALYSIS_H

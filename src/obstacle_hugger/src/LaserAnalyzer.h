@@ -7,7 +7,6 @@
 
 class LaserAnalyzer {
 public:
-    LaserAnalyzer();
     LaserAnalysis analyze(sensor_msgs::msg::LaserScan::SharedPtr msg);
 private:
     constexpr static double DIST_WITHIN_SIGHT = 8.0;
