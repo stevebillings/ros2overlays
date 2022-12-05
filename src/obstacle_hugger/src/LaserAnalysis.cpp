@@ -4,11 +4,8 @@
 
 #include "LaserAnalysis.h"
 
-unsigned long LaserAnalysis::get_min_range_index() const {
-    return min_range_index_;
-}
-double LaserAnalysis::get_min_range() const {
-    return min_range_;
+const NearestSighting& LaserAnalysis::get_nearest_sighting() const {
+    return nearestSighting_;
 }
 
 bool LaserAnalysis::is_in_sight() const {
@@ -21,14 +18,6 @@ bool LaserAnalysis::is_near() const {
 
 bool LaserAnalysis::is_too_near() const {
     return too_near_;
-}
-
-unsigned long LaserAnalysis::get_leftmost_index() const {
-    return leftmost_index_;
-}
-
-unsigned long LaserAnalysis::get_straight_index() const {
-    return straight_index_;
 }
 
 bool LaserAnalysis::is_to_right() const {

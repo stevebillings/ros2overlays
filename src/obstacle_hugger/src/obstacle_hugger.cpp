@@ -31,11 +31,14 @@ class ObstacleHuggingNode : public rclcpp::Node {
             if (last_laser_scan_msg_ == nullptr) {
                 return; // wait for sight
             }
-            LaserAnalysis laserAnalysis = laserAnalyzer_.analyze(last_laser_scan_msg_);
+            // TODO only get characteristics once
+            LaserCharacteristics laserCharacteristics = laserAnalyzer_.determine_characteristics(last_laser_scan_msg_);
+            RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laserCharacteristics.get_straight_index(), laserCharacteristics.get_leftmost_index());
+            LaserAnalysis laserAnalysis = laserAnalyzer_.analyze(logger_, laserCharacteristics, last_laser_scan_msg_);
             RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
-                        laserAnalysis.get_min_range_index(),
-                        laserAnalysis.get_min_range(),
-                        laserAnalysis.get_leftmost_index());
+                        laserAnalysis.get_nearest_sighting().get_range_index(),
+                        laserAnalysis.get_nearest_sighting().get_range(),
+                        laserCharacteristics.get_leftmost_index());
             if (laserAnalysis.is_in_sight()) {
                 set_obstacle_seen(laserAnalysis.is_to_right());
                 // TODO analysis class should have some sort of toString() to do this
@@ -58,7 +61,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             switch (fullState_.get_fsm_state()) {
                 case FsmState::SEARCH:
                     if (laserAnalysis.is_in_sight()) {
-                        Velocity approachVelocity = velocityCalculator_.toApproach(logger_, laserAnalysis);
+                        Velocity approachVelocity = velocityCalculator_.toApproach(logger_, laserCharacteristics, laserAnalysis);
                         RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(),
                                     approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
@@ -111,13 +114,13 @@ class ObstacleHuggingNode : public rclcpp::Node {
             }
         }
 
-        double get_seconds_in_state() {
+        double get_seconds_in_state() const {
             double seconds_in_state = now().seconds() - fullState_.get_state_start_time();
             RCLCPP_INFO(logger_, "Seconds since entered current state: %lf", seconds_in_state);
             return seconds_in_state;
         }
 
-        void set_velocity(const Velocity &velocity) {
+        void set_velocity(const Velocity &velocity) const {
             RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = velocity.get_forward();
@@ -132,7 +135,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
         void set_obstacle_seen(bool seen_to_right) {
             fullState_.set_obstacle_last_seen_time(logger_, now().seconds(), seen_to_right);
         }
-	private:
+
         rclcpp::TimerBase::SharedPtr timer_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
         sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
