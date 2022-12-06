@@ -1,13 +1,13 @@
 
-#ifndef OBSTACLE_HUGGER_VELOCITYCALCULATOR_H
-#define OBSTACLE_HUGGER_VELOCITYCALCULATOR_H
+#ifndef OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H
+#define OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include "LaserCharacteristics.h"
-#include "LaserAnalysis.h"
-#include "Velocity.h"
+#include "laser_characteristics.h"
+#include "laser_analysis.h"
+#include "velocity.h"
 
 class VelocityCalculator
 {
@@ -18,4 +18,4 @@ public:
   Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laserAnalysis);
 };
 
-#endif  // OBSTACLE_HUGGER_VELOCITYCALCULATOR_H
+#endif  // OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H

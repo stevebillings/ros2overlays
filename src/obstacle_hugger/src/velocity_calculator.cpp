@@ -1,5 +1,5 @@
 
-#include "VelocityCalculator.h"
+#include "velocity_calculator.h"
 
 VelocityCalculator::VelocityCalculator()
 {

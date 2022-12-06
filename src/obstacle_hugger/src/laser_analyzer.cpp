@@ -1,4 +1,4 @@
-#include "LaserAnalyzer.h"
+#include "laser_analyzer.h"
 
 LaserCharacteristics LaserAnalyzer::determine_characteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const
 {

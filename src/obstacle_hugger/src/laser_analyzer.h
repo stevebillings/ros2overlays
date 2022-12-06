@@ -1,12 +1,12 @@
 
-#ifndef OBSTACLE_HUGGER_LASERANALYZER_H
-#define OBSTACLE_HUGGER_LASERANALYZER_H
+#ifndef OBSTACLE_HUGGER_LASER_ANALYZER_H
+#define OBSTACLE_HUGGER_LASER_ANALYZER_H
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/logger.hpp>
 #include "sensor_msgs/msg/laser_scan.hpp"
-#include "LaserAnalysis.h"
-#include "LaserCharacteristics.h"
+#include "laser_analysis.h"
+#include "laser_characteristics.h"
 
 class LaserAnalyzer
 {
@@ -21,4 +21,4 @@ private:
   constexpr static double DIST_TOO_NEAR = 1.5;
 };
 
-#endif  // OBSTACLE_HUGGER_LASERANALYZER_H
+#endif  // OBSTACLE_HUGGER_LASER_ANALYZER_H

@@ -2,8 +2,8 @@
 // Created by stevebillings on 12/4/22.
 //
 
-#ifndef OBSTACLE_HUGGER_NEARESTSIGHTING_H
-#define OBSTACLE_HUGGER_NEARESTSIGHTING_H
+#ifndef OBSTACLE_HUGGER_NEAREST_SIGHTING_H
+#define OBSTACLE_HUGGER_NEAREST_SIGHTING_H
 
 class NearestSighting
 {
@@ -18,4 +18,4 @@ private:
   const double range_;
 };
 
-#endif  // OBSTACLE_HUGGER_NEARESTSIGHTING_H
+#endif  // OBSTACLE_HUGGER_NEAREST_SIGHTING_H

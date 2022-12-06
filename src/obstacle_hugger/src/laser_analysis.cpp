@@ -2,7 +2,7 @@
 // Created by stevebillings on 11/21/22.
 //
 
-#include "LaserAnalysis.h"
+#include "laser_analysis.h"
 
 const NearestSighting LaserAnalysis::get_nearest_sighting() const
 {

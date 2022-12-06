@@ -1,8 +1,8 @@
 
-#ifndef OBSTACLE_HUGGER_LASERANALYSIS_H
-#define OBSTACLE_HUGGER_LASERANALYSIS_H
+#ifndef OBSTACLE_HUGGER_LASER_ANALYSIS_H
+#define OBSTACLE_HUGGER_LASER_ANALYSIS_H
 
-#include "NearestSighting.h"
+#include "nearest_sighting.h"
 
 class LaserAnalysis
 {
@@ -43,4 +43,4 @@ private:
   const unsigned long delta_from_perpendicular_left_;
 };
 
-#endif  // OBSTACLE_HUGGER_LASERANALYSIS_H
+#endif  // OBSTACLE_HUGGER_LASER_ANALYSIS_H

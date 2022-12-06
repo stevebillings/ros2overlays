@@ -1,10 +1,10 @@
 
-#ifndef OBSTACLE_HUGGER_FULLSTATE_H
-#define OBSTACLE_HUGGER_FULLSTATE_H
+#ifndef OBSTACLE_HUGGER_FULL_STATE_H
+#define OBSTACLE_HUGGER_FULL_STATE_H
 
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include "FsmState.h"
+#include "fsm_state.h"
 
 // times are expressed in seconds since epoch
 class FullState
@@ -27,4 +27,4 @@ private:
   bool obstacle_last_seen_to_right_ = false;
 };
 
-#endif  // OBSTACLE_HUGGER_FULLSTATE_H
+#endif  // OBSTACLE_HUGGER_FULL_STATE_H

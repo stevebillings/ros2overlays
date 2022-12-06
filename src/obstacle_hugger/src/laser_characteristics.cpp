@@ -2,7 +2,7 @@
 // Created by stevebillings on 12/4/22.
 //
 
-#include "LaserCharacteristics.h"
+#include "laser_characteristics.h"
 
 unsigned long LaserCharacteristics::get_leftmost_index() const
 {

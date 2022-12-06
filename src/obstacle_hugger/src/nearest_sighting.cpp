@@ -2,7 +2,7 @@
 // Created by stevebillings on 12/4/22.
 //
 
-#include "NearestSighting.h"
+#include "nearest_sighting.h"
 
 unsigned long NearestSighting::get_range_index() const
 {

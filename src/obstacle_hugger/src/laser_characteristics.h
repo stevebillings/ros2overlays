@@ -2,8 +2,8 @@
 // Created by stevebillings on 12/4/22.
 //
 
-#ifndef OBSTACLE_HUGGER_LASERCHARACTERISTICS_H
-#define OBSTACLE_HUGGER_LASERCHARACTERISTICS_H
+#ifndef OBSTACLE_HUGGER_LASER_CHARACTERISTICS_H
+#define OBSTACLE_HUGGER_LASER_CHARACTERISTICS_H
 
 class LaserCharacteristics
 {
@@ -18,4 +18,4 @@ private:
   unsigned long straight_index_;
 };
 
-#endif  // OBSTACLE_HUGGER_LASERCHARACTERISTICS_H
+#endif  // OBSTACLE_HUGGER_LASER_CHARACTERISTICS_H

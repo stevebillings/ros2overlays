@@ -1,5 +1,5 @@
 
-#include "FullState.h"
+#include "full_state.h"
 
 void FullState::set_state(const FsmState& new_state, double state_start_time)
 {
