@@ -12,7 +12,7 @@ public:
                                  const bool to_right,
                                  const unsigned long delta_from_perpendicular_right,
                                  const unsigned long delta_from_perpendicular_left)
-                                 : nearestSighting_(nearestSighting)
+            : nearestSighting_(nearestSighting)
             , in_sight_(in_sight)
             , near_(near)
             , too_near_(too_near)

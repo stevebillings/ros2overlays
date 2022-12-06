@@ -1,7 +1,7 @@
 
 #include "FullState.h"
 
-void FullState::set_state(FsmState new_state, double state_start_time) {
+void FullState::set_state(const FsmState& new_state, double state_start_time) {
     fsm_state_ = new_state;
     state_start_time_ = state_start_time;
 }

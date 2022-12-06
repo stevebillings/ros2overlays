@@ -9,7 +9,7 @@
 // times are expressed in seconds since epoch
 class FullState {
 public:
-    void set_state(FsmState new_state, double state_start_time);
+    void set_state(const FsmState& new_state, double state_start_time);
     void set_obstacle_last_seen_time(const rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right);
     FsmState get_fsm_state() const;
     const char *get_fsm_state_name() const;

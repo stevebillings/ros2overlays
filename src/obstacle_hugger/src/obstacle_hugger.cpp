@@ -134,7 +134,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             drive_publisher_->publish(drive_message);
         }
 
-        void set_state(FsmState new_state) {
+        void set_state(const FsmState& new_state) {
             fullState_.set_state(new_state, now().seconds());
             RCLCPP_INFO(logger_, "New FsmState: %s", fullState_.get_fsm_state_name());
         }
