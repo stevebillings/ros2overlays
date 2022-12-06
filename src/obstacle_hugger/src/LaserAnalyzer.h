@@ -8,14 +8,17 @@
 #include "LaserAnalysis.h"
 #include "LaserCharacteristics.h"
 
-class LaserAnalyzer {
+class LaserAnalyzer
+{
 public:
-    LaserCharacteristics determine_characteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
-    LaserAnalysis analyze(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics, sensor_msgs::msg::LaserScan::SharedPtr msg) const;
+  LaserCharacteristics determine_characteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
+  LaserAnalysis analyze(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
+                        sensor_msgs::msg::LaserScan::SharedPtr msg) const;
+
 private:
-    constexpr static double DIST_WITHIN_SIGHT = 9.5;
-    constexpr static double DIST_NEAR = 4.0;
-    constexpr static double DIST_TOO_NEAR = 1.5;
+  constexpr static double DIST_WITHIN_SIGHT = 9.5;
+  constexpr static double DIST_NEAR = 4.0;
+  constexpr static double DIST_TOO_NEAR = 1.5;
 };
 
-#endif //OBSTACLE_HUGGER_LASERANALYZER_H
+#endif  // OBSTACLE_HUGGER_LASERANALYZER_H

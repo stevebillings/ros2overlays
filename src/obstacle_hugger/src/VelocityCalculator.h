@@ -9,11 +9,13 @@
 #include "LaserAnalysis.h"
 #include "Velocity.h"
 
-class VelocityCalculator {
+class VelocityCalculator
+{
 public:
-    VelocityCalculator();
-    Velocity toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics, const LaserAnalysis& laserAnalysis);
-    Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laserAnalysis);
+  VelocityCalculator();
+  Velocity toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
+                      const LaserAnalysis& laserAnalysis);
+  Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laserAnalysis);
 };
 
-#endif //OBSTACLE_HUGGER_VELOCITYCALCULATOR_H
+#endif  // OBSTACLE_HUGGER_VELOCITYCALCULATOR_H
