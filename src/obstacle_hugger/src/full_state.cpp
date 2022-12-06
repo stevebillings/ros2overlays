@@ -1,13 +1,13 @@
 
 #include "full_state.h"
 
-void FullState::set_state(const FsmState& new_state, double state_start_time)
+void FullState::setState(const FsmState& new_state, double state_start_time)
 {
   fsm_state_ = new_state;
   state_start_time_ = state_start_time;
 }
-void FullState::set_obstacle_last_seen_time(const rclcpp::Logger& logger, double obstacle_last_seen_time,
-                                            bool seen_to_right)
+void FullState::setObstacleLastSeenTime(const rclcpp::Logger& logger, double obstacle_last_seen_time,
+                                        bool seen_to_right)
 {
   RCLCPP_INFO(logger, "Obstacle seen at time %lf\n", obstacle_last_seen_time);
   obstacle_has_been_seen_ = true;
@@ -15,12 +15,12 @@ void FullState::set_obstacle_last_seen_time(const rclcpp::Logger& logger, double
   obstacle_last_seen_to_right_ = seen_to_right;
 }
 
-FsmState FullState::get_fsm_state() const
+FsmState FullState::getFsmState() const
 {
   return fsm_state_;
 }
 
-const char* FullState::get_fsm_state_name() const
+const char* FullState::getFsmStateName() const
 {
   switch (fsm_state_)
   {
@@ -37,20 +37,20 @@ const char* FullState::get_fsm_state_name() const
   }
 }
 
-bool FullState::has_obstacle_been_seen() const
+bool FullState::hasObstacleBeenSeen() const
 {
   return obstacle_has_been_seen_;
 }
-double FullState::get_obstacle_last_seen_time() const
+double FullState::getObstacleLastSeenTime() const
 {
   return obstacle_last_seen_time_;
 }
-bool FullState::was_obstacle_last_seen_to_right() const
+bool FullState::wasObstacleLastSeenToRight() const
 {
   return obstacle_last_seen_to_right_;
 }
 
-double FullState::get_state_start_time() const
+double FullState::getStateStartTime() const
 {
   return state_start_time_;
 }

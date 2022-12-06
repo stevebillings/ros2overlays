@@ -4,36 +4,36 @@
 
 #include "laser_analysis.h"
 
-const NearestSighting LaserAnalysis::get_nearest_sighting() const
+const NearestSighting LaserAnalysis::getNearestSighting() const
 {
   return nearestSighting_;
 }
 
-bool LaserAnalysis::is_in_sight() const
+bool LaserAnalysis::isInSight() const
 {
   return in_sight_;
 }
 
-bool LaserAnalysis::is_near() const
+bool LaserAnalysis::isNear() const
 {
   return near_;
 }
 
-bool LaserAnalysis::is_too_near() const
+bool LaserAnalysis::isTooNear() const
 {
   return too_near_;
 }
 
-bool LaserAnalysis::is_to_right() const
+bool LaserAnalysis::isToRight() const
 {
   return to_right_;
 }
 
-unsigned long LaserAnalysis::get_delta_from_perpendicular_right() const
+unsigned long LaserAnalysis::getDeltaFromPerpendicularRight() const
 {
   return delta_from_perpendicular_right_;
 }
-unsigned long LaserAnalysis::get_delta_from_perpendicular_left() const
+unsigned long LaserAnalysis::getDeltaFromPerpendicularLeft() const
 {
   return delta_from_perpendicular_left_;
 }

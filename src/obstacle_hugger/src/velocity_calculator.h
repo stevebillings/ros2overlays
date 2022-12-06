@@ -13,9 +13,9 @@ class VelocityCalculator
 {
 public:
   VelocityCalculator();
-  Velocity toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
-                      const LaserAnalysis& laserAnalysis);
-  Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laserAnalysis);
+  Velocity toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laser_characteristics,
+                      const LaserAnalysis& laser_analysis);
+  Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laser_analysis);
 };
 
 #endif  // OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H

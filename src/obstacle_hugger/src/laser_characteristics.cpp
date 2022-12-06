@@ -4,12 +4,12 @@
 
 #include "laser_characteristics.h"
 
-unsigned long LaserCharacteristics::get_leftmost_index() const
+unsigned long LaserCharacteristics::getLeftmostIndex() const
 {
   return leftmost_index_;
 }
 
-unsigned long LaserCharacteristics::get_straight_index() const
+unsigned long LaserCharacteristics::getStraightIndex() const
 {
   return straight_index_;
 }

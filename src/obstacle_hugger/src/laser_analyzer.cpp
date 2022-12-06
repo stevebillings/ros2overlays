@@ -1,6 +1,6 @@
 #include "laser_analyzer.h"
 
-LaserCharacteristics LaserAnalyzer::determine_characteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const
+LaserCharacteristics LaserAnalyzer::determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const
 {
   unsigned long straight_index = msg->ranges.size() / 2;
   unsigned long leftmost_index = msg->ranges.size() - 1;
@@ -12,7 +12,7 @@ LaserAnalysis LaserAnalyzer::analyze(const rclcpp::Logger& logger, const LaserCh
 {
   int cur_range_index = 0;
   double min_range = 1000.0;
-  unsigned long min_range_index = laserCharacteristics.get_straight_index();
+  unsigned long min_range_index = laserCharacteristics.getStraightIndex();
   for (auto this_range : msg->ranges)
   {
     if (this_range < min_range)
@@ -27,9 +27,9 @@ LaserAnalysis LaserAnalyzer::analyze(const rclcpp::Logger& logger, const LaserCh
   bool near = min_range < DIST_NEAR;
   bool too_near = min_range < DIST_TOO_NEAR;
 
-  bool to_right = min_range_index < laserCharacteristics.get_straight_index();
+  bool to_right = min_range_index < laserCharacteristics.getStraightIndex();
   unsigned long delta_from_perpendicular_right = min_range_index;
-  unsigned long delta_from_perpendicular_left = laserCharacteristics.get_leftmost_index() - min_range_index;
+  unsigned long delta_from_perpendicular_left = laserCharacteristics.getLeftmostIndex() - min_range_index;
 
   // TODO how does this memory get freed?
   NearestSighting nearestSighting = NearestSighting(min_range_index, min_range);

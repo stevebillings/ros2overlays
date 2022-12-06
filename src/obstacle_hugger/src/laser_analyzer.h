@@ -11,7 +11,7 @@
 class LaserAnalyzer
 {
 public:
-  LaserCharacteristics determine_characteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
+  LaserCharacteristics determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
   LaserAnalysis analyze(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
                         sensor_msgs::msg::LaserScan::SharedPtr msg) const;
 

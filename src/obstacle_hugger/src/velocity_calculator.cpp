@@ -5,48 +5,48 @@ VelocityCalculator::VelocityCalculator()
 {
 }
 
-Velocity VelocityCalculator::toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
-                                        const LaserAnalysis& laserAnalysis)
+Velocity VelocityCalculator::toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laser_characteristics,
+                                        const LaserAnalysis& laser_analysis)
 {
   double yaw_delta_factor = 0.01;
-  if (laserAnalysis.is_near())
+  if (laser_analysis.isNear())
   {
     return Velocity(0.0, 0.0);
   }
-  double x = laserAnalysis.get_nearest_sighting().get_range() / 4.0;
+  double x = laser_analysis.getNearestSighting().getRange() / 4.0;
   double yaw;
-  if (laserAnalysis.is_to_right())
+  if (laser_analysis.isToRight())
   {
     long index_offset =
-        laserCharacteristics.get_straight_index() - laserAnalysis.get_nearest_sighting().get_range_index();
+            laser_characteristics.getStraightIndex() - laser_analysis.getNearestSighting().getRangeIndex();
     yaw = (double)index_offset * yaw_delta_factor * -1.0;
   }
   else
   {
     long index_offset =
-        laserAnalysis.get_nearest_sighting().get_range_index() - laserCharacteristics.get_straight_index();
+            laser_analysis.getNearestSighting().getRangeIndex() - laser_characteristics.getStraightIndex();
     yaw = (double)index_offset * yaw_delta_factor;
   }
   RCLCPP_INFO(logger, "toApproach() calculated: x: %lf, yaw: %lf", x, yaw);
   return Velocity(x, yaw);
 }
-Velocity VelocityCalculator::toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laserAnalysis)
+Velocity VelocityCalculator::toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laser_analysis)
 {
   double yaw_delta_factor = 0.01;
   RCLCPP_INFO(logger, "Calculating velocities to parallel obstacle\n");
   double x = 1.5;
   double yaw;
-  if (laserAnalysis.is_in_sight())
+  if (laser_analysis.isInSight())
   {
-    if (laserAnalysis.is_to_right())
+    if (laser_analysis.isToRight())
     {
       RCLCPP_INFO(logger, "Obstacle is to the right\n");
-      yaw = laserAnalysis.get_delta_from_perpendicular_right() * yaw_delta_factor;
+      yaw = laser_analysis.getDeltaFromPerpendicularRight() * yaw_delta_factor;
     }
     else
     {
       RCLCPP_INFO(logger, "Obstacle is to the left\n");
-      yaw = (laserAnalysis.get_delta_from_perpendicular_left()) * yaw_delta_factor * -1;
+      yaw = (laser_analysis.getDeltaFromPerpendicularLeft()) * yaw_delta_factor * -1;
     }
   }
   RCLCPP_INFO(logger, "Calculated velocities: x: %lf; yaw: %lf\n", x, yaw);

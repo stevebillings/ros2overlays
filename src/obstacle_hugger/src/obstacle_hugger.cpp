@@ -15,107 +15,107 @@ public:
   ObstacleHuggingNode() : Node("obstacle_hugging_node")
   {
     laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>(
-        "laser_scan", 10, std::bind(&ObstacleHuggingNode::laser_scan_callback, this, _1));
-    timer_ = create_wall_timer(50ms, std::bind(&ObstacleHuggingNode::control_callback, this));
+        "laser_scan", 10, std::bind(&ObstacleHuggingNode::laserScanCallback, this, _1));
+    timer_ = create_wall_timer(50ms, std::bind(&ObstacleHuggingNode::controlCallback, this));
     drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-    set_state(FsmState::SEARCH);
+      setState(FsmState::SEARCH);
   }
 
 private:
-  void laser_scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
+  void laserScanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
     last_laser_scan_msg_ = std::move(msg);
   }
 
-  void control_callback()
+  void controlCallback()
   {
     RCLCPP_INFO(logger_, "======================");
-    RCLCPP_INFO(logger_, "* FsmState: %s", fullState_.get_fsm_state_name());
+    RCLCPP_INFO(logger_, "* FsmState: %s", full_state_.getFsmStateName());
     if (last_laser_scan_msg_ == nullptr)
     {
       return;  // wait for sight
     }
     // TODO only get characteristics once
-    LaserCharacteristics laserCharacteristics = laserAnalyzer_.determine_characteristics(last_laser_scan_msg_);
-    RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laserCharacteristics.get_straight_index(),
-                laserCharacteristics.get_leftmost_index());
-    LaserAnalysis laserAnalysis = laserAnalyzer_.analyze(logger_, laserCharacteristics, last_laser_scan_msg_);
+    LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(last_laser_scan_msg_);
+    RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics.getStraightIndex(),
+                laser_characteristics.getLeftmostIndex());
+    LaserAnalysis laser_analysis = laser_analyzer_.analyze(logger_, laser_characteristics, last_laser_scan_msg_);
     RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
-                laserAnalysis.get_nearest_sighting().get_range_index(),
-                laserAnalysis.get_nearest_sighting().get_range(), laserCharacteristics.get_leftmost_index());
-    if (laserAnalysis.is_in_sight())
+                laser_analysis.getNearestSighting().getRangeIndex(),
+                laser_analysis.getNearestSighting().getRange(), laser_characteristics.getLeftmostIndex());
+    if (laser_analysis.isInSight())
     {
-      set_obstacle_seen(laserAnalysis.is_to_right());
+        setObstacleSeen(laser_analysis.isToRight());
       // TODO analysis class should have some sort of toString() to do this
-      if (laserAnalysis.is_to_right())
+      if (laser_analysis.isToRight())
       {
         RCLCPP_INFO(logger_, "%ld increments away from perpendicular right",
-                    laserAnalysis.get_delta_from_perpendicular_right());
+                    laser_analysis.getDeltaFromPerpendicularRight());
       }
       else
       {
         RCLCPP_INFO(logger_, "%ld increments away from perpendicular left",
-                    laserAnalysis.get_delta_from_perpendicular_left());
+                    laser_analysis.getDeltaFromPerpendicularLeft());
       }
     }
 
     double time_lost = 0.0;
-    if (fullState_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight())
+    if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight())
     {
-      time_lost = now().seconds() - fullState_.get_obstacle_last_seen_time();
+      time_lost = now().seconds() - full_state_.getObstacleLastSeenTime();
     }
 
-    switch (fullState_.get_fsm_state())
+    switch (full_state_.getFsmState())
     {
       case FsmState::SEARCH:
-        if (laserAnalysis.is_in_sight())
+        if (laser_analysis.isInSight())
         {
-          Velocity approachVelocity = velocityCalculator_.toApproach(logger_, laserCharacteristics, laserAnalysis);
-          RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(),
-                      approachVelocity.get_yaw());
-          set_velocity(approachVelocity);
-          if (laserAnalysis.is_near())
+          Velocity approach_velocity = velocity_calculator_.toApproach(logger_, laser_characteristics, laser_analysis);
+          RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.getForward(),
+                      approach_velocity.getYaw());
+            setVelocity(approach_velocity);
+          if (laser_analysis.isNear())
           {
-            set_state(FsmState::OBSTACLE_NEAR);
+              setState(FsmState::OBSTACLE_NEAR);
           }
         }
-        else if (fullState_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight() && time_lost > 1.0)
+        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight() && time_lost > 1.0)
         {
           RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than a second");
-          if (fullState_.was_obstacle_last_seen_to_right())
+          if (full_state_.wasObstacleLastSeenToRight())
           {
-            set_velocity(Velocity::createSearchSpinRight());
+              setVelocity(Velocity::createSearchSpinRight());
           }
           else
           {
-            set_velocity(Velocity::createSearchSpinLeft());
+              setVelocity(Velocity::createSearchSpinLeft());
           }
         }
-        else if (!fullState_.has_obstacle_been_seen())
+        else if (!full_state_.hasObstacleBeenSeen())
         {
           RCLCPP_WARN(logger_, "Obstacle has never been seen and is not within sight");
-          if (fullState_.has_obstacle_been_seen() && fullState_.was_obstacle_last_seen_to_right())
+          if (full_state_.hasObstacleBeenSeen() && full_state_.wasObstacleLastSeenToRight())
           {
-            set_velocity(Velocity::createSearchSpinRight());
+              setVelocity(Velocity::createSearchSpinRight());
           }
           else
           {
-            set_velocity(Velocity::createSearchSpinLeft());
+              setVelocity(Velocity::createSearchSpinLeft());
           }
         }
         break;
       case FsmState::OBSTACLE_NEAR:
-        if (laserAnalysis.is_too_near())
+        if (laser_analysis.isTooNear())
         {
-          set_velocity(Velocity::createReverse());
-          set_state(FsmState::OBSTACLE_TOO_NEAR);
+            setVelocity(Velocity::createReverse());
+            setState(FsmState::OBSTACLE_TOO_NEAR);
         }
-        else if (laserAnalysis.is_in_sight())
+        else if (laser_analysis.isInSight())
         {
-          Velocity parallelVelocity = velocityCalculator_.toParallel(logger_, laserAnalysis);
-          RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallelVelocity.get_forward(),
-                      parallelVelocity.get_yaw());
-          set_velocity(parallelVelocity);
+          Velocity parallel_velocity = velocity_calculator_.toParallel(logger_, laser_analysis);
+          RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallel_velocity.getForward(),
+                      parallel_velocity.getYaw());
+            setVelocity(parallel_velocity);
         }
         else
         {
@@ -128,65 +128,64 @@ private:
           else
           {
             RCLCPP_WARN(logger_, "Obstacle is not within sight");
-            set_velocity(Velocity::createStopped());
-            set_state(FsmState::SEARCH);
+              setVelocity(Velocity::createStopped());
+              setState(FsmState::SEARCH);
           }
         }
         break;
       case FsmState::OBSTACLE_TOO_NEAR:
-        if (get_seconds_in_state() > 2.0)
+        if (getSecondsInState() > 2.0)
         {
-          set_velocity(Velocity::createStopped());
-          set_state(FsmState::SEARCH);
+            setVelocity(Velocity::createStopped());
+            setState(FsmState::SEARCH);
         }
         break;
       case FsmState::ERROR:
-        set_velocity(Velocity::createStopped());
+          setVelocity(Velocity::createStopped());
         break;
     }
   }
 
-  double get_seconds_in_state() const
+  double getSecondsInState() const
   {
-    double seconds_in_state = now().seconds() - fullState_.get_state_start_time();
+    double seconds_in_state = now().seconds() - full_state_.getStateStartTime();
     RCLCPP_INFO(logger_, "Seconds since entered current state: %lf", seconds_in_state);
     return seconds_in_state;
   }
 
-  void set_velocity(const Velocity& velocity)
+  void setVelocity(const Velocity& velocity)
   {
-    // RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
-    if ((abs(velocity.get_forward()) > 5.0) || (abs(velocity.get_yaw() > 5.0)))
+    if ((abs(velocity.getForward()) > 5.0) || (abs(velocity.getYaw() > 5.0)))
     {
-      RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
-      set_state(FsmState::ERROR);
+      RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.getForward(), velocity.getYaw());
+        setState(FsmState::ERROR);
       return;
     }
     geometry_msgs::msg::Twist drive_message;
-    drive_message.linear.x = velocity.get_forward();
-    drive_message.angular.z = velocity.get_yaw();
+    drive_message.linear.x = velocity.getForward();
+    drive_message.angular.z = velocity.getYaw();
     drive_publisher_->publish(drive_message);
   }
 
-  void set_state(const FsmState& new_state)
+  void setState(const FsmState& new_state)
   {
-    fullState_.set_state(new_state, now().seconds());
-    RCLCPP_INFO(logger_, "New FsmState: %s", fullState_.get_fsm_state_name());
+      full_state_.setState(new_state, now().seconds());
+    RCLCPP_INFO(logger_, "New FsmState: %s", full_state_.getFsmStateName());
   }
 
-  void set_obstacle_seen(bool seen_to_right)
+  void setObstacleSeen(bool seen_to_right)
   {
-    fullState_.set_obstacle_last_seen_time(logger_, now().seconds(), seen_to_right);
+      full_state_.setObstacleLastSeenTime(logger_, now().seconds(), seen_to_right);
   }
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
   sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
-  LaserAnalyzer laserAnalyzer_;
-  FullState fullState_ = FullState();
+  LaserAnalyzer laser_analyzer_;
+  FullState full_state_ = FullState();
   rclcpp::Logger logger_ = get_logger();
-  VelocityCalculator velocityCalculator_ = VelocityCalculator();
+  VelocityCalculator velocity_calculator_ = VelocityCalculator();
 };
 
 int main(int argc, char* argv[])

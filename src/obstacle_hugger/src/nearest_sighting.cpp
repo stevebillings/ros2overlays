@@ -4,11 +4,11 @@
 
 #include "nearest_sighting.h"
 
-unsigned long NearestSighting::get_range_index() const
+unsigned long NearestSighting::getRangeIndex() const
 {
   return range_index_;
 }
-double NearestSighting::get_range() const
+double NearestSighting::getRange() const
 {
   return range_;
 }

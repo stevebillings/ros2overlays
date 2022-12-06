@@ -10,14 +10,14 @@
 class FullState
 {
 public:
-  void set_state(const FsmState& new_state, double state_start_time);
-  void set_obstacle_last_seen_time(const rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right);
-  FsmState get_fsm_state() const;
-  const char* get_fsm_state_name() const;
-  double get_state_start_time() const;
-  bool has_obstacle_been_seen() const;
-  double get_obstacle_last_seen_time() const;
-  bool was_obstacle_last_seen_to_right() const;
+  void setState(const FsmState& new_state, double state_start_time);
+  void setObstacleLastSeenTime(const rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right);
+  FsmState getFsmState() const;
+  const char* getFsmStateName() const;
+  double getStateStartTime() const;
+  bool hasObstacleBeenSeen() const;
+  double getObstacleLastSeenTime() const;
+  bool wasObstacleLastSeenToRight() const;
 
 private:
   FsmState fsm_state_ = FsmState::SEARCH;

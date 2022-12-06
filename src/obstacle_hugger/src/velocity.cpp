@@ -30,12 +30,12 @@ Velocity Velocity::createReverse()
   return Velocity(-1.0, 0.0);
 }
 
-double Velocity::get_forward() const
+double Velocity::getForward() const
 {
   return forward_;
 }
 
-double Velocity::get_yaw() const
+double Velocity::getYaw() const
 {
   return yaw_;
 }
