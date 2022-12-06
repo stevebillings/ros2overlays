@@ -17,7 +17,7 @@ LaserAnalysis LaserAnalyzer::analyze(const rclcpp::Logger& logger, const LaserCh
         }
         cur_range_index++;
     }
-    RCLCPP_INFO(logger, "*** min_range_index: %ld, min_range: %lf", min_range_index, min_range);
+    RCLCPP_INFO(logger, "min_range_index: %ld, min_range: %lf", min_range_index, min_range);
     bool in_sight = min_range < DIST_WITHIN_SIGHT;
     bool near = min_range < DIST_NEAR;
     bool too_near = min_range < DIST_TOO_NEAR;

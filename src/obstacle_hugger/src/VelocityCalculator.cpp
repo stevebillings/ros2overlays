@@ -9,11 +9,16 @@ Velocity VelocityCalculator::toApproach(const rclcpp::Logger& logger, const Lase
         return Velocity(0.0, 0.0);
     }
     double x = laserAnalysis.get_nearest_sighting().get_range() / 4.0;
+    RCLCPP_INFO(logger, "nearest index: %ld; straight index: %ld, yaw_delta_factor: %lf", laserAnalysis.get_nearest_sighting().get_range_index(), laserCharacteristics.get_straight_index(), yaw_delta_factor);
     double yaw;
     if (laserAnalysis.is_to_right()) {
-        yaw = (laserCharacteristics.get_straight_index() - laserAnalysis.get_nearest_sighting().get_range_index()) * yaw_delta_factor * -1;
+        long index_offset = laserCharacteristics.get_straight_index() - laserAnalysis.get_nearest_sighting().get_range_index();
+        yaw = (double)index_offset * yaw_delta_factor * -1.0;
     } else {
-        yaw = (laserAnalysis.get_nearest_sighting().get_range_index() - laserCharacteristics.get_straight_index()) * yaw_delta_factor;
+        RCLCPP_INFO(logger, "obstacle is to left");
+        long index_offset = laserAnalysis.get_nearest_sighting().get_range_index() - laserCharacteristics.get_straight_index();
+        RCLCPP_INFO(logger, "index offset: %ld", index_offset);
+        yaw = (double)index_offset * yaw_delta_factor;
     }
     RCLCPP_INFO(logger, "toApproach() calculated: x: %lf, yaw: %lf", x, yaw);
     return Velocity(x, yaw);

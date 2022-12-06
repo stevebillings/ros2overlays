@@ -19,7 +19,15 @@ public:
             , to_right_(to_right)
             , delta_from_perpendicular_right_(delta_from_perpendicular_right)
             , delta_from_perpendicular_left_(delta_from_perpendicular_left) {};
-    const NearestSighting& get_nearest_sighting() const;
+    LaserAnalysis(const LaserAnalysis& src)
+            : nearestSighting_(src.get_nearest_sighting())
+            , in_sight_(src.is_in_sight())
+            , near_(src.is_near())
+            , too_near_(src.is_too_near())
+            , to_right_(src.is_to_right())
+            , delta_from_perpendicular_right_(src.get_delta_from_perpendicular_right())
+            , delta_from_perpendicular_left_(src.get_delta_from_perpendicular_left()) {};
+    const NearestSighting get_nearest_sighting() const;
     bool is_in_sight() const;
     bool is_near() const;
     bool is_too_near() const;
@@ -28,7 +36,7 @@ public:
     unsigned long get_delta_from_perpendicular_left() const;
 
 private:
-    const NearestSighting& nearestSighting_;
+    const NearestSighting nearestSighting_;
     const bool in_sight_;
     const bool near_;
     const bool too_near_;

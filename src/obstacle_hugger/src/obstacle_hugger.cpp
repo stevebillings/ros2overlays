@@ -51,8 +51,6 @@ class ObstacleHuggingNode : public rclcpp::Node {
                 }
             }
 
-
-
             double time_lost = 0.0;
             if (fullState_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight()) {
                 time_lost = now().seconds() - fullState_.get_obstacle_last_seen_time();
@@ -65,7 +63,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approachVelocity.get_forward(),
                                     approachVelocity.get_yaw());
                         set_velocity(approachVelocity);
-                        if (approachVelocity.get_forward() == 0.0) {
+                        if (laserAnalysis.is_near()) {
                             set_state(FsmState::OBSTACLE_NEAR);
                         }
                     } else if (fullState_.has_obstacle_been_seen() && !laserAnalysis.is_in_sight() && time_lost > 1.0) {
@@ -111,6 +109,9 @@ class ObstacleHuggingNode : public rclcpp::Node {
                         set_state(FsmState::SEARCH);
                     }
                     break;
+                case FsmState::ERROR:
+                    set_velocity(Velocity::createStopped());
+                    break;
             }
         }
 
@@ -120,8 +121,13 @@ class ObstacleHuggingNode : public rclcpp::Node {
             return seconds_in_state;
         }
 
-        void set_velocity(const Velocity &velocity) const {
-            RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
+        void set_velocity(const Velocity &velocity) {
+            //RCLCPP_INFO(logger_, "Setting new velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
+            if ((abs(velocity.get_forward()) > 5.0) || (abs(velocity.get_yaw() > 5.0))) {
+                RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
+                set_state(FsmState::ERROR);
+                return;
+            }
             geometry_msgs::msg::Twist drive_message;
             drive_message.linear.x = velocity.get_forward();
             drive_message.angular.z = velocity.get_yaw();
@@ -132,6 +138,7 @@ class ObstacleHuggingNode : public rclcpp::Node {
             fullState_.set_state(new_state, now().seconds());
             RCLCPP_INFO(logger_, "New FsmState: %s", fullState_.get_fsm_state_name());
         }
+
         void set_obstacle_seen(bool seen_to_right) {
             fullState_.set_obstacle_last_seen_time(logger_, now().seconds(), seen_to_right);
         }

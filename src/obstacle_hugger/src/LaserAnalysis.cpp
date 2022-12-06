@@ -4,7 +4,7 @@
 
 #include "LaserAnalysis.h"
 
-const NearestSighting& LaserAnalysis::get_nearest_sighting() const {
+const NearestSighting LaserAnalysis::get_nearest_sighting() const {
     return nearestSighting_;
 }
 

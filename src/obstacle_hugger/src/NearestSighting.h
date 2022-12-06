@@ -11,7 +11,9 @@ public:
     NearestSighting(const unsigned long range_index, double range)
     : range_index_(range_index)
     , range_(range) {};
-
+    NearestSighting(const NearestSighting& src)
+    : range_index_(src.get_range_index())
+    , range_(src.get_range()) {};
     unsigned long get_range_index() const;
     double get_range() const;
 private:

@@ -24,6 +24,8 @@ const char *FullState::get_fsm_state_name() const {
             return "OBSTACLE_NEAR";
         case FsmState::OBSTACLE_TOO_NEAR:
             return "OBSTACLE_TOO_NEAR";
+        case FsmState::ERROR:
+            return "ERROR";
         default:
             return "UNRECOGNIZED";
     }
