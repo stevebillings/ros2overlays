@@ -6,6 +6,7 @@
 #include "laser_analysis.h"
 #include "velocity_calculator.h"
 
+static const double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
@@ -79,9 +80,10 @@ private:
               setState(FsmState::OBSTACLE_NEAR);
           }
         }
-        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight() && time_lost > 0.75)
+        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight()
+          && time_lost > TIME_LOST_TOLERANCE_SECONDS)
         {
-          RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than a second");
+          RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than %lf seconds", TIME_LOST_TOLERANCE_SECONDS);
           if (full_state_.wasObstacleLastSeenToRight())
           {
               setVelocity(Velocity::createSearchSpinRight());
@@ -164,7 +166,6 @@ private:
     geometry_msgs::msg::Twist drive_message;
     drive_message.linear.x = velocity.getForward();
     drive_message.angular.z = velocity.getYaw();
-    RCLCPP_INFO(logger_, "publishing: x: %lf; yaw: %lf", drive_message.linear.x, drive_message.angular.z);
     drive_publisher_->publish(drive_message);
   }
 
