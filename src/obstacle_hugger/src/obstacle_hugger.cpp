@@ -79,7 +79,7 @@ private:
               setState(FsmState::OBSTACLE_NEAR);
           }
         }
-        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight() && time_lost > 1.0)
+        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight() && time_lost > 0.75)
         {
           RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than a second");
           if (full_state_.wasObstacleLastSeenToRight())
@@ -164,6 +164,7 @@ private:
     geometry_msgs::msg::Twist drive_message;
     drive_message.linear.x = velocity.getForward();
     drive_message.angular.z = velocity.getYaw();
+    RCLCPP_INFO(logger_, "publishing: x: %lf; yaw: %lf", drive_message.linear.x, drive_message.angular.z);
     drive_publisher_->publish(drive_message);
   }
 

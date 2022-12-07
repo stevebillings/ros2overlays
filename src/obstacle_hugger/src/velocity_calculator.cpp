@@ -46,6 +46,6 @@ Velocity VelocityCalculator::toParallel(const rclcpp::Logger& logger, const Lase
       yaw = (laser_analysis.getDeltaFromPerpendicularLeft()) * DELTA_TO_YAW_MULTIPLIER * -1;
     }
   }
-  RCLCPP_INFO(logger, "Calculated velocities: PARALLEL_X_VELOCITY: %lf; yaw: %lf\n", PARALLEL_X_VELOCITY, yaw);
+  RCLCPP_INFO(logger, "Calculated velocities: x: %lf; yaw: %lf\n", PARALLEL_X_VELOCITY, yaw);
   return Velocity(PARALLEL_X_VELOCITY, yaw);
 }
