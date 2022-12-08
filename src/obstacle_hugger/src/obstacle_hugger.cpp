@@ -45,18 +45,8 @@ private:
                 laser_analysis.getNearestSighting().getRange(), laser_characteristics.getLeftmostIndex());
     if (laser_analysis.isInSight())
     {
-        setObstacleSeen(laser_analysis.isToRight());
-      // TODO analysis class should have some sort of toString() to do this
-      if (laser_analysis.isToRight())
-      {
-        RCLCPP_INFO(logger_, "%ld increments away from perpendicular right",
-                    laser_analysis.getDeltaFromPerpendicular());
-      }
-      else
-      {
-        RCLCPP_INFO(logger_, "%ld increments away from perpendicular left",
-                    laser_analysis.getDeltaFromPerpendicular());
-      }
+      setObstacleSeen(laser_analysis.isToRight());
+      RCLCPP_INFO(logger_, "laser analysis: %s", laser_analysis.toString().c_str());
     }
 
     double time_lost = 0.0;
@@ -156,7 +146,7 @@ private:
 
   void setVelocity(const Velocity& velocity)
   {
-    if ((abs(velocity.getForward()) > 5.0) || (abs(velocity.getYaw() > 5.0)))
+    if ((abs(velocity.getForward()) > 5.0) || (abs(velocity.getYaw()) > 5.0))
     {
       RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.getForward(), velocity.getYaw());
         setState(FsmState::ERROR);

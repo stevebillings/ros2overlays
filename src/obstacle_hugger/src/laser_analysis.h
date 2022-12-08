@@ -2,6 +2,7 @@
 #ifndef OBSTACLE_HUGGER_LASER_ANALYSIS_H
 #define OBSTACLE_HUGGER_LASER_ANALYSIS_H
 
+#include <string>
 #include "nearest_sighting.h"
 
 class LaserAnalysis
@@ -28,6 +29,7 @@ public:
   bool isTooNear() const;
   bool isToRight() const;
   unsigned long getDeltaFromPerpendicular() const;
+  std::string toString() const;
 
 private:
   const NearestSighting nearestSighting_;
