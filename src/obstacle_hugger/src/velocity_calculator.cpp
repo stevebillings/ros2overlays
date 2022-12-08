@@ -38,12 +38,12 @@ Velocity VelocityCalculator::toParallel(const rclcpp::Logger& logger, const Lase
     if (laser_analysis.isToRight())
     {
       RCLCPP_INFO(logger, "Obstacle is to the right\n");
-      yaw = laser_analysis.getDeltaFromPerpendicularRight() * DELTA_TO_YAW_MULTIPLIER;
+      yaw = laser_analysis.getDeltaFromPerpendicular() * DELTA_TO_YAW_MULTIPLIER;
     }
     else
     {
       RCLCPP_INFO(logger, "Obstacle is to the left\n");
-      yaw = (laser_analysis.getDeltaFromPerpendicularLeft()) * DELTA_TO_YAW_MULTIPLIER * -1;
+      yaw = (laser_analysis.getDeltaFromPerpendicular()) * DELTA_TO_YAW_MULTIPLIER * -1;
     }
   }
   RCLCPP_INFO(logger, "Calculated velocities: x: %lf; yaw: %lf\n", PARALLEL_X_VELOCITY, yaw);

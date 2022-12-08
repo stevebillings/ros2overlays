@@ -6,7 +6,6 @@
 #include "laser_analysis.h"
 #include "velocity_calculator.h"
 
-static const double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
@@ -51,12 +50,12 @@ private:
       if (laser_analysis.isToRight())
       {
         RCLCPP_INFO(logger_, "%ld increments away from perpendicular right",
-                    laser_analysis.getDeltaFromPerpendicularRight());
+                    laser_analysis.getDeltaFromPerpendicular());
       }
       else
       {
         RCLCPP_INFO(logger_, "%ld increments away from perpendicular left",
-                    laser_analysis.getDeltaFromPerpendicularLeft());
+                    laser_analysis.getDeltaFromPerpendicular());
       }
     }
 
@@ -188,6 +187,7 @@ private:
   FullState full_state_ = FullState();
   rclcpp::Logger logger_ = get_logger();
   VelocityCalculator velocity_calculator_ = VelocityCalculator();
+  static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 };
 
 int main(int argc, char* argv[])

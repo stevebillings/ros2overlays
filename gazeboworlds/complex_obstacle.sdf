@@ -446,7 +446,7 @@
                 <visual name='visual'>
                     <geometry>
                         <box>
-                            <size>4.0 0.5 2.0</size>
+                            <size>3.0 0.5 2.0</size>
                         </box>
                     </geometry>
                     <!--let's add color to our link-->
@@ -459,7 +459,7 @@
                 <collision name='collision'> <!--todo: describe why we need the collision-->
                     <geometry>
                         <box>
-                            <size>4.0 0.5 2.0</size>
+                            <size>3.0 0.5 2.0</size>
                         </box>
                     </geometry>
                 </collision>

@@ -28,11 +28,13 @@ LaserAnalysis LaserAnalyzer::analyze(const rclcpp::Logger& logger, const LaserCh
   bool too_near = min_range < DIST_TOO_NEAR;
 
   bool to_right = min_range_index < laserCharacteristics.getStraightIndex();
-  unsigned long delta_from_perpendicular_right = min_range_index;
-  unsigned long delta_from_perpendicular_left = laserCharacteristics.getLeftmostIndex() - min_range_index;
-
+  unsigned long delta_from_perpendicular = 0L;
+  if (to_right) {
+    delta_from_perpendicular = min_range_index;
+  } else {
+    delta_from_perpendicular = laserCharacteristics.getLeftmostIndex() - min_range_index;
+  }
   // TODO how does this memory get freed?
   NearestSighting nearestSighting = NearestSighting(min_range_index, min_range);
-  return LaserAnalysis(nearestSighting, in_sight, near, too_near, to_right, delta_from_perpendicular_right,
-                       delta_from_perpendicular_left);
+  return LaserAnalysis(nearestSighting, in_sight, near, too_near, to_right, delta_from_perpendicular);
 }

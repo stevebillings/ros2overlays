@@ -29,11 +29,7 @@ bool LaserAnalysis::isToRight() const
   return to_right_;
 }
 
-unsigned long LaserAnalysis::getDeltaFromPerpendicularRight() const
+unsigned long LaserAnalysis::getDeltaFromPerpendicular() const
 {
-  return delta_from_perpendicular_right_;
-}
-unsigned long LaserAnalysis::getDeltaFromPerpendicularLeft() const
-{
-  return delta_from_perpendicular_left_;
+  return delta_from_perpendicular_;
 }
