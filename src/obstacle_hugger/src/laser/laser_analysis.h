@@ -3,7 +3,7 @@
 #define OBSTACLE_HUGGER_LASER_ANALYSIS_H
 
 #include <string>
-#include "nearest_sighting.h"
+#include "../obstacle/nearest_sighting.h"
 
 class LaserAnalysis
 {

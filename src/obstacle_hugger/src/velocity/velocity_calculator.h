@@ -5,8 +5,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include "laser_characteristics.h"
-#include "laser_analysis.h"
+#include "../laser/laser_characteristics.h"
+#include "../laser/laser_analysis.h"
 #include "velocity.h"
 
 class VelocityCalculator

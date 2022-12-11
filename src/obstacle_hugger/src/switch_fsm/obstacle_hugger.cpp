@@ -2,9 +2,9 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "full_state.h"
-#include "laser_analyzer.h"
-#include "laser_analysis.h"
-#include "velocity_calculator.h"
+#include "../laser/laser_analyzer.h"
+#include "../laser/laser_analysis.h"
+#include "../velocity/velocity_calculator.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
