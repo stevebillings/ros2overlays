@@ -35,6 +35,7 @@ if(BUILD_TESTING)
   set(ament_cmake_copyright_FOUND TRUE)
 
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_cmake_gmock REQUIRED)
   add_subdirectory(tests)
 endif()
 
