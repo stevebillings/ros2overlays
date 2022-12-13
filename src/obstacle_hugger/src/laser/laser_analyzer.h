@@ -10,7 +10,7 @@ class LaserAnalyzer
 {
 public:
   LaserCharacteristics determineCharacteristics(const std::vector<float>& laser_ranges) const;
-  LaserAnalysis analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics, const std::vector<float>& laser_ranges) const;
+  LaserAnalysis analyze(const LaserCharacteristics& laserCharacteristics, const std::vector<float>& laser_ranges) const;
 
 private:
   constexpr static double DIST_WITHIN_SIGHT = 9.5;

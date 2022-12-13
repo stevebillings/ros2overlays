@@ -7,7 +7,7 @@ LaserCharacteristics LaserAnalyzer::determineCharacteristics(const std::vector<f
   return LaserCharacteristics(leftmost_index, straight_index);
 }
 
-LaserAnalysis LaserAnalyzer::analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics,
+LaserAnalysis LaserAnalyzer::analyze(const LaserCharacteristics& laserCharacteristics,
                                      const std::vector<float>& laser_ranges) const
 {
   int cur_range_index = 0;
@@ -22,11 +22,6 @@ LaserAnalysis LaserAnalyzer::analyze(const SimpleLogger& logger, const LaserChar
     }
     cur_range_index++;
   }
-  std::string log_msg = std::string("min_range_index: ")
-    .append(std::to_string(min_range_index))
-    .append(", min_range: ")
-    .append(std::to_string(min_range));
-  logger.log(log_msg.c_str());
   bool in_sight = min_range < DIST_WITHIN_SIGHT;
   bool near = min_range < DIST_NEAR;
   bool too_near = min_range < DIST_TOO_NEAR;
