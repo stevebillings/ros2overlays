@@ -1,20 +1,19 @@
 #include "laser_analyzer.h"
-#include "LaserRanges.h"
 
-LaserCharacteristics LaserAnalyzer::determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const
+LaserCharacteristics LaserAnalyzer::determineCharacteristics(const std::vector<float>& laser_ranges) const
 {
-  unsigned long straight_index = msg->ranges.size() / 2;
-  unsigned long leftmost_index = msg->ranges.size() - 1;
+  unsigned long straight_index = laser_ranges.size() / 2;
+  unsigned long leftmost_index = laser_ranges.size() - 1;
   return LaserCharacteristics(leftmost_index, straight_index);
 }
 
 LaserAnalysis LaserAnalyzer::analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics,
-                                     const LaserRanges& laser_ranges) const
+                                     const std::vector<float>& laser_ranges) const
 {
   int cur_range_index = 0;
   double min_range = 1000.0;
   unsigned long min_range_index = laserCharacteristics.getStraightIndex();
-  for (float this_range : laser_ranges.get_ranges())
+  for (float this_range : laser_ranges)
   {
     if (this_range < min_range)
     {
