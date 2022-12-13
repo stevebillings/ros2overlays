@@ -5,6 +5,7 @@
 #include "../laser/laser_analyzer.h"
 #include "../laser/laser_analysis.h"
 #include "../velocity/velocity_calculator.h"
+#include "../laser/LaserRanges.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -39,7 +40,8 @@ private:
     LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(last_laser_scan_msg_);
     RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics.getStraightIndex(),
                 laser_characteristics.getLeftmostIndex());
-    LaserAnalysis laser_analysis = laser_analyzer_.analyze(logger_, laser_characteristics, last_laser_scan_msg_);
+    LaserRanges laser_ranges(last_laser_scan_msg_->ranges);
+    LaserAnalysis laser_analysis = laser_analyzer_.analyze(logger_, laser_characteristics, laser_ranges);
     RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
                 laser_analysis.getNearestSighting().getRangeIndex(),
                 laser_analysis.getNearestSighting().getRange(), laser_characteristics.getLeftmostIndex());

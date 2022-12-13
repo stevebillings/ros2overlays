@@ -1,4 +1,5 @@
 #include "laser_analyzer.h"
+#include "LaserRanges.h"
 
 LaserCharacteristics LaserAnalyzer::determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const
 {
@@ -8,12 +9,12 @@ LaserCharacteristics LaserAnalyzer::determineCharacteristics(sensor_msgs::msg::L
 }
 
 LaserAnalysis LaserAnalyzer::analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics,
-                                     sensor_msgs::msg::LaserScan::SharedPtr laser_msg) const
+                                     const LaserRanges& laser_ranges) const
 {
   int cur_range_index = 0;
   double min_range = 1000.0;
   unsigned long min_range_index = laserCharacteristics.getStraightIndex();
-  for (auto this_range : laser_msg->ranges)
+  for (float this_range : laser_ranges.get_ranges())
   {
     if (this_range < min_range)
     {
@@ -22,10 +23,10 @@ LaserAnalysis LaserAnalyzer::analyze(const SimpleLogger& logger, const LaserChar
     }
     cur_range_index++;
   }
-  std::string log_msg = "min_range_index: ";
-  log_msg.append(std::to_string(min_range_index));
-  log_msg.append(", min_range: ");
-  log_msg.append(std::to_string(min_range));
+  std::string log_msg = std::string("min_range_index: ")
+    .append(std::to_string(min_range_index))
+    .append(", min_range: ")
+    .append(std::to_string(min_range));
   logger.log(log_msg.c_str());
   bool in_sight = min_range < DIST_WITHIN_SIGHT;
   bool near = min_range < DIST_NEAR;

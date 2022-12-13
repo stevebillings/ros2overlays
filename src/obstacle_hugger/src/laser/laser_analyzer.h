@@ -6,13 +6,13 @@
 #include "laser_analysis.h"
 #include "laser_characteristics.h"
 #include "../logger/SimpleLogger.h"
+#include "LaserRanges.h"
 
 class LaserAnalyzer
 {
 public:
   LaserCharacteristics determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
-  LaserAnalysis analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics,
-                        sensor_msgs::msg::LaserScan::SharedPtr laser_msg) const;
+  LaserAnalysis analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics, const LaserRanges& laser_ranges) const;
 
 private:
   constexpr static double DIST_WITHIN_SIGHT = 9.5;
