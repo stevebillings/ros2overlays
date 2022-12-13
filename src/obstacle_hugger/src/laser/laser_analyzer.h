@@ -2,18 +2,17 @@
 #ifndef OBSTACLE_HUGGER_LASER_ANALYZER_H
 #define OBSTACLE_HUGGER_LASER_ANALYZER_H
 
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/logger.hpp>
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "laser_analysis.h"
 #include "laser_characteristics.h"
+#include "../logger/SimpleLogger.h"
 
 class LaserAnalyzer
 {
 public:
   LaserCharacteristics determineCharacteristics(sensor_msgs::msg::LaserScan::SharedPtr msg) const;
-  LaserAnalysis analyze(const rclcpp::Logger& logger, const LaserCharacteristics& laserCharacteristics,
-                        sensor_msgs::msg::LaserScan::SharedPtr msg) const;
+  LaserAnalysis analyze(const SimpleLogger& logger, const LaserCharacteristics& laserCharacteristics,
+                        sensor_msgs::msg::LaserScan::SharedPtr laser_msg) const;
 
 private:
   constexpr static double DIST_WITHIN_SIGHT = 9.5;

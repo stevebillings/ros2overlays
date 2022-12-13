@@ -15,7 +15,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(obstacle_hugger src/switch_fsm/obstacle_hugger.cpp src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h src/laser/laser_analysis.cpp src/laser/laser_analysis.h src/velocity/velocity.cpp src/velocity/velocity.h src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h src/switch_fsm/fsm_state.h src/switch_fsm/full_state.cpp src/switch_fsm/full_state.h src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h)
+add_executable(obstacle_hugger src/switch_fsm/obstacle_hugger.cpp src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h src/laser/laser_analysis.cpp src/laser/laser_analysis.h src/velocity/velocity.cpp src/velocity/velocity.h src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h src/switch_fsm/fsm_state.h src/switch_fsm/full_state.cpp src/switch_fsm/full_state.h src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/logger/SimpleLogger.cpp src/logger/SimpleLogger.h)
 
 set(dependencies
   rclcpp
