@@ -3,7 +3,7 @@
 //
 
 #include <rclcpp/logging.hpp>
-#include "SimpleLogger.h"
+#include "simple_logger.h"
 
 void SimpleLogger::log(const char* msg) const {
   RCLCPP_INFO(logger_, msg);

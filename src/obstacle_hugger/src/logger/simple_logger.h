@@ -2,8 +2,8 @@
 // Created by stevebillings on 12/12/22.
 //
 
-#ifndef OBSTACLE_HUGGER_SIMPLELOGGER_H
-#define OBSTACLE_HUGGER_SIMPLELOGGER_H
+#ifndef OBSTACLE_HUGGER_SIMPLE_LOGGER_H
+#define OBSTACLE_HUGGER_SIMPLE_LOGGER_H
 
 #include <rclcpp/logger.hpp>
 
@@ -17,4 +17,4 @@ private:
 };
 
 
-#endif //OBSTACLE_HUGGER_SIMPLELOGGER_H
+#endif //OBSTACLE_HUGGER_SIMPLE_LOGGER_H
