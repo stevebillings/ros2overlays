@@ -34,14 +34,19 @@ private:
     {
       return;  // wait for sight
     }
-    // TODO only get characteristics once
-    LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(last_laser_scan_msg_->ranges);
-    RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics.getStraightIndex(),
-                laser_characteristics.getLeftmostIndex());
-    LaserAnalysis laser_analysis = laser_analyzer_.analyze(laser_characteristics, last_laser_scan_msg_->ranges);
+    if (laser_characteristics_ == nullptr)
+    {
+      LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
+          last_laser_scan_msg_->ranges);
+      // Copy characteristics to heap so it sticks around for the duration of the node
+      laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
+    }
+    RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics_->getStraightIndex(),
+                laser_characteristics_->getLeftmostIndex());
+    LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
     RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
                 laser_analysis.getNearestSighting().getRangeIndex(),
-                laser_analysis.getNearestSighting().getRange(), laser_characteristics.getLeftmostIndex());
+                laser_analysis.getNearestSighting().getRange(), laser_characteristics_->getLeftmostIndex());
     if (laser_analysis.isInSight())
     {
       setObstacleSeen(laser_analysis.isToRight());
@@ -56,10 +61,11 @@ private:
 
     switch (full_state_.getFsmState())
     {
+      // TODO write unit tests for velocity calculator
       case FsmState::SEARCH:
         if (laser_analysis.isInSight())
         {
-          Velocity approach_velocity = velocity_calculator_.toApproach(logger_, laser_characteristics, laser_analysis);
+          Velocity approach_velocity = velocity_calculator_.toApproach(logger_, *laser_characteristics_, laser_analysis);
           RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.getForward(),
                       approach_velocity.getYaw());
             setVelocity(approach_velocity);
@@ -176,6 +182,7 @@ private:
   FullState full_state_ = FullState();
   rclcpp::Logger logger_ = get_logger();
   VelocityCalculator velocity_calculator_ = VelocityCalculator();
+  LaserCharacteristics* laser_characteristics_ = nullptr;
   static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 };
 
