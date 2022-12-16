@@ -32,13 +32,13 @@ private:
     RCLCPP_INFO(logger_, "* FsmState: %s", full_state_.getFsmStateName());
     if (last_laser_scan_msg_ == nullptr)
     {
-      return;  // wait for sight
+      return;  // ain't seen nothin' yet
     }
     if (laser_characteristics_ == nullptr)
     {
       LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
           last_laser_scan_msg_->ranges);
-      // Copy characteristics to heap so it sticks around for the duration of the node
+      // Toss characteristics object onto heap so it sticks around for the life of the node
       laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
     }
     RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics_->getStraightIndex(),
@@ -61,7 +61,6 @@ private:
 
     switch (full_state_.getFsmState())
     {
-      // TODO write unit tests for velocity calculator
       case FsmState::SEARCH:
         if (laser_analysis.isInSight())
         {
