@@ -15,7 +15,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(obstacle_hugger src/switch_fsm/obstacle_hugger.cpp src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h src/laser/laser_analysis.cpp src/laser/laser_analysis.h src/velocity/velocity.cpp src/velocity/velocity.h src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h src/switch_fsm/fsm_state.h src/switch_fsm/full_state.cpp src/switch_fsm/full_state.h src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/logger/simple_logger.cpp src/logger/simple_logger.h)
+add_executable(switch_fsm src/switch_fsm/obstacle_hugger.cpp src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h src/laser/laser_analysis.cpp src/laser/laser_analysis.h src/velocity/velocity.cpp src/velocity/velocity.h src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h src/switch_fsm/fsm_state.h src/switch_fsm/full_state.cpp src/switch_fsm/full_state.h src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/logger/simple_logger.cpp src/logger/simple_logger.h)
 
 set(dependencies
   rclcpp
@@ -23,7 +23,7 @@ set(dependencies
   geometry_msgs
 )
 
-ament_target_dependencies(obstacle_hugger ${dependencies})
+ament_target_dependencies(switch_fsm ${dependencies})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -40,7 +40,7 @@ if(BUILD_TESTING)
 endif()
 
 install(TARGETS
-  obstacle_hugger
+  switch_fsm
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(${dependencies})
