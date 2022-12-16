@@ -13,9 +13,9 @@ class VelocityCalculator
 {
 public:
   VelocityCalculator();
-  Velocity toApproach(const rclcpp::Logger& logger, const LaserCharacteristics& laser_characteristics,
+  Velocity toApproach(const LaserCharacteristics& laser_characteristics,
                       const LaserAnalysis& laser_analysis);
-  Velocity toParallel(const rclcpp::Logger& logger, const LaserAnalysis& laser_analysis);
+  Velocity toParallel(const LaserAnalysis& laser_analysis);
 private:
   double PARALLEL_X_VELOCITY = 1.5;
   double DELTA_TO_YAW_MULTIPLIER = 0.01;

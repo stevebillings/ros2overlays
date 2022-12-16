@@ -65,7 +65,7 @@ private:
       case FsmState::SEARCH:
         if (laser_analysis.isInSight())
         {
-          Velocity approach_velocity = velocity_calculator_.toApproach(logger_, *laser_characteristics_, laser_analysis);
+          Velocity approach_velocity = velocity_calculator_.toApproach(*laser_characteristics_, laser_analysis);
           RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.getForward(),
                       approach_velocity.getYaw());
             setVelocity(approach_velocity);
@@ -108,7 +108,7 @@ private:
         }
         else if (laser_analysis.isInSight())
         {
-          Velocity parallel_velocity = velocity_calculator_.toParallel(logger_, laser_analysis);
+          Velocity parallel_velocity = velocity_calculator_.toParallel(laser_analysis);
           RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallel_velocity.getForward(),
                       parallel_velocity.getYaw());
             setVelocity(parallel_velocity);
