@@ -31,33 +31,13 @@ private:
     RCLCPP_INFO(logger_, "======================");
     RCLCPP_INFO(logger_, "* FsmState: %s", full_state_.getFsmStateName());
     if (last_laser_scan_msg_ == nullptr)
-    {
       return;  // ain't seen nothin' yet
-    }
-    if (laser_characteristics_ == nullptr)
-    {
-      LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
-          last_laser_scan_msg_->ranges);
-      // Toss characteristics object onto heap so it sticks around for the life of the node
-      laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
-    }
-    RCLCPP_INFO(logger_, "straight index: %ld, leftmost_index: %ld", laser_characteristics_->getStraightIndex(),
-                laser_characteristics_->getLeftmostIndex());
-    LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
-    RCLCPP_INFO(logger_, "min_range_index: %ld; range: %lf; leftmost index: %ld",
-                laser_analysis.getNearestSighting().getRangeIndex(),
-                laser_analysis.getNearestSighting().getRange(), laser_characteristics_->getLeftmostIndex());
-    if (laser_analysis.isInSight())
-    {
-      setObstacleSeen(laser_analysis.isToRight());
-      RCLCPP_INFO(logger_, "laser analysis: %s", laser_analysis.toString().c_str());
-    }
 
-    double time_lost = 0.0;
-    if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight())
-    {
-      time_lost = now().seconds() - full_state_.getObstacleLastSeenTime();
-    }
+    init_laser_characteristics();
+    LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
+    record_obstacle_sighting(laser_analysis);
+    // TODO should time_lost be stored in state? Not sure new info belongs in state
+    double time_lost = calculate_time_lost(laser_analysis);
 
     switch (full_state_.getFsmState())
     {
@@ -141,6 +121,37 @@ private:
     }
   }
 
+  double calculate_time_lost(const LaserAnalysis &laser_analysis) const
+  {
+    double time_lost = 0.0;
+    if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight())
+    {
+      time_lost = now().seconds() - full_state_.getObstacleLastSeenTime();
+    }
+    return time_lost;
+  }
+
+  void record_obstacle_sighting(const LaserAnalysis &laser_analysis)
+  {
+    if (laser_analysis.isInSight())
+    {
+      bool seenToRight = laser_analysis.isToRight();
+      // TODO this is new info; not sure it belongs in state
+      full_state_.setObstacleLastSeenTime(logger_, now().seconds(), seenToRight);
+    }
+  }
+
+  void init_laser_characteristics()
+  {
+    if (laser_characteristics_ == nullptr)
+    {
+      LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
+          last_laser_scan_msg_->ranges);
+      // Toss characteristics object onto heap so it sticks around for the life of the node
+      laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
+    }
+  }
+
   double getSecondsInState() const
   {
     double seconds_in_state = now().seconds() - full_state_.getStateStartTime();
@@ -166,11 +177,6 @@ private:
   {
       full_state_.setState(new_state, now().seconds());
     RCLCPP_INFO(logger_, "New FsmState: %s", full_state_.getFsmStateName());
-  }
-
-  void setObstacleSeen(bool seen_to_right)
-  {
-      full_state_.setObstacleLastSeenTime(logger_, now().seconds(), seen_to_right);
   }
 
   rclcpp::TimerBase::SharedPtr timer_;
