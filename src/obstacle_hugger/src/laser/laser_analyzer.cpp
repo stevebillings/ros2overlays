@@ -1,3 +1,4 @@
+#include <vector>
 #include "laser_analyzer.h"
 
 LaserCharacteristics LaserAnalyzer::determineCharacteristics(const std::vector<float>& laser_ranges) const

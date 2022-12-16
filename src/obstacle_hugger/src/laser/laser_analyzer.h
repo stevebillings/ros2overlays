@@ -4,7 +4,6 @@
 
 #include "laser_analysis.h"
 #include "laser_characteristics.h"
-#include "../logger/simple_logger.h"
 
 class LaserAnalyzer
 {
