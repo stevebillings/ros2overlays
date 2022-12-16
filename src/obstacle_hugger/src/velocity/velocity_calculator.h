@@ -2,9 +2,6 @@
 #ifndef OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H
 #define OBSTACLE_HUGGER_VELOCITY_CALCULATOR_H
 
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/logger.hpp>
-#include <rclcpp/logging.hpp>
 #include "../laser/laser_characteristics.h"
 #include "../laser/laser_analysis.h"
 #include "velocity.h"
