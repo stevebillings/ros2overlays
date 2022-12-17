@@ -5,7 +5,7 @@
 
 class StateNear : public State
 {
-  FsmState act(const History& history, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const;
+  Action act(const History& history, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const override;
   const char *name() const;
 };
 

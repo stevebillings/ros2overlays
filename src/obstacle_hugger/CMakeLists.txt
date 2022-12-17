@@ -33,7 +33,15 @@ add_executable(gof_fsm
         src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h
         src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h
         src/laser/laser_analysis.cpp src/laser/laser_analysis.h
-        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/fsm_gof/state/state.h src/fsm_gof/states.cpp src/fsm_gof/states.h src/history/history.cpp src/history/history.h src/fsm_gof/state/state_search.cpp src/fsm_gof/state/state_search.h src/fsm_gof/state/state_near.cpp src/fsm_gof/state/state_near.h src/fsm_gof/state/state_too_near.cpp src/fsm_gof/state/state_too_near.h src/fsm_gof/state/state_error.cpp src/fsm_gof/state/state_error.h)
+        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h
+        src/fsm_gof/state/state.h
+        src/fsm_gof/states.cpp src/fsm_gof/states.h
+        src/history/history.cpp src/history/history.h
+        src/fsm_gof/state/state_search.cpp src/fsm_gof/state/state_search.h
+        src/fsm_gof/state/state_near.cpp src/fsm_gof/state/state_near.h
+        src/fsm_gof/state/state_too_near.cpp src/fsm_gof/state/state_too_near.h
+        src/fsm_gof/state/state_error.cpp src/fsm_gof/state/state_error.h
+        src/fsm_gof/action.cpp src/fsm_gof/action.h)
 
 set(dependencies
   rclcpp

@@ -12,23 +12,23 @@ public:
     States states;
     State* cur_state = states.get_state(FsmState::SEARCH);
     std::cout << "states.get_state(search) returned: " << cur_state->name() << "\n";
-    FsmState new_state_id = cur_state->act(history, laser_characteristics, laser_analysis);
+    Action action = cur_state->act(history, laser_characteristics, laser_analysis);
 
-    cur_state = states.get_state(new_state_id);
+    cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
-    new_state_id = cur_state->act(history, laser_characteristics, laser_analysis);
+    action = cur_state->act(history, laser_characteristics, laser_analysis);
 
-    cur_state = states.get_state(new_state_id);
+    cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
-    new_state_id = cur_state->act(history, laser_characteristics, laser_analysis);
+    action = cur_state->act(history, laser_characteristics, laser_analysis);
 
-    cur_state = states.get_state(new_state_id);
+    cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
-    new_state_id = cur_state->act(history, laser_characteristics, laser_analysis);
+    action = cur_state->act(history, laser_characteristics, laser_analysis);
 
-    cur_state = states.get_state(new_state_id);
+    cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
-    new_state_id = cur_state->act(history, laser_characteristics, laser_analysis);
+    action = cur_state->act(history, laser_characteristics, laser_analysis);
   }
 };
 
