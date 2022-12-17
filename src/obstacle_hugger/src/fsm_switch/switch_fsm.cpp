@@ -4,6 +4,7 @@
 #include "full_state.h"
 #include "../laser/laser_analyzer.h"
 #include "../velocity/velocity_calculator.h"
+#include "../history/history.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -35,9 +36,19 @@ private:
 
     init_laser_characteristics();
     LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
-    record_obstacle_sighting(laser_analysis);
+
+    // TODO: These to data points are new observations; maybe pass them and laser characteristics + analysis to state.act(observations)
+    // They are both time-related; time since X. ***history***
     // TODO should time_lost be stored in state? Not sure new info belongs in state
+    if (laser_analysis.isInSight())
+    {
+      bool seenToRight = laser_analysis.isToRight();
+      history_.set_obstacle_last_seen_time(now().seconds(), seenToRight);
+      // TODO obsolete:
+      full_state_.setObstacleLastSeenTime(now().seconds(), seenToRight);
+    }
     double time_lost = calculate_time_lost(laser_analysis);
+    history_.set_time_lost(time_lost);
 
     switch (full_state_.getFsmState())
     {
@@ -54,7 +65,7 @@ private:
           }
         }
         else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight()
-          && time_lost > TIME_LOST_TOLERANCE_SECONDS)
+          && history_.get_time_lost() > TIME_LOST_TOLERANCE_SECONDS)
         {
           RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than %lf seconds", TIME_LOST_TOLERANCE_SECONDS);
           if (full_state_.wasObstacleLastSeenToRight())
@@ -94,11 +105,11 @@ private:
         }
         else
         {
-          RCLCPP_INFO(logger_, "Lost sight of obstacle %lf seconds ago", time_lost);
-          if (time_lost < 1.0)
+          RCLCPP_INFO(logger_, "Lost sight of obstacle %lf seconds ago", history_.get_time_lost());
+          if (history_.get_time_lost() < 1.0)
           {
             RCLCPP_INFO(logger_, "Lost sight of obstacle, but it's only been %lf seconds, so being patient...",
-                        time_lost);
+                        history_.get_time_lost());
           }
           else
           {
@@ -129,16 +140,6 @@ private:
       time_lost = now().seconds() - full_state_.getObstacleLastSeenTime();
     }
     return time_lost;
-  }
-
-  void record_obstacle_sighting(const LaserAnalysis &laser_analysis)
-  {
-    if (laser_analysis.isInSight())
-    {
-      bool seenToRight = laser_analysis.isToRight();
-      // TODO this is new info; not sure it belongs in state
-      full_state_.setObstacleLastSeenTime(logger_, now().seconds(), seenToRight);
-    }
   }
 
   void init_laser_characteristics()
@@ -188,6 +189,7 @@ private:
   rclcpp::Logger logger_ = get_logger();
   VelocityCalculator velocity_calculator_ = VelocityCalculator();
   LaserCharacteristics* laser_characteristics_ = nullptr;
+  History history_ = History();
   static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 };
 

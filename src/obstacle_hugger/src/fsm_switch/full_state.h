@@ -4,14 +4,14 @@
 
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#include "fsm_state.h"
+#include "../common/fsm_state.h"
 
 // times are expressed in seconds since epoch
 class FullState
 {
 public:
   void setState(const FsmState& new_state, double state_start_time);
-  void setObstacleLastSeenTime(const rclcpp::Logger& logger, double obstacle_last_seen_time, bool seen_to_right);
+  void setObstacleLastSeenTime(double obstacle_last_seen_time, bool seen_to_right);
   FsmState getFsmState() const;
   const char* getFsmStateName() const;
   double getStateStartTime() const;

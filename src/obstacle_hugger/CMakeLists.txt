@@ -17,22 +17,23 @@ find_package(std_msgs REQUIRED)
 
 add_executable(switch_fsm
         src/fsm_switch/switch_fsm.cpp
+        src/common/fsm_state.h
         src/velocity/velocity.cpp src/velocity/velocity.h
         src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h
-        src/fsm_switch/fsm_state.h
         src/fsm_switch/full_state.cpp src/fsm_switch/full_state.h
         src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h
         src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h
         src/laser/laser_analysis.cpp src/laser/laser_analysis.h
-        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h)
+        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/history/history.cpp src/history/history.h)
 add_executable(gof_fsm
         src/fsm_gof/gof_fsm.cpp
+        src/common/fsm_state.h
         src/velocity/velocity.cpp src/velocity/velocity.h
         src/velocity/velocity_calculator.cpp src/velocity/velocity_calculator.h
         src/laser/laser_analyzer.cpp src/laser/laser_analyzer.h
         src/laser/laser_characteristics.cpp src/laser/laser_characteristics.h
         src/laser/laser_analysis.cpp src/laser/laser_analysis.h
-        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h)
+        src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h src/fsm_gof/state.h src/fsm_gof/states.cpp src/fsm_gof/states.h src/history/history.cpp src/history/history.h src/fsm_gof/search/state_search.cpp src/fsm_gof/search/state_search.h)
 
 set(dependencies
   rclcpp
