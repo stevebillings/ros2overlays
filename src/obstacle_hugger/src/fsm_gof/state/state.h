@@ -13,6 +13,7 @@ class State
 public:
   virtual const char* name() const = 0;
   virtual Action act(const History& history, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const = 0;
+  virtual ~State() {};
 };
 
 
