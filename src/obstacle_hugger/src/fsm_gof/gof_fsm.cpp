@@ -13,22 +13,27 @@ public:
     State* cur_state = states.get_state(FsmState::SEARCH);
     std::cout << "states.get_state(search) returned: " << cur_state->name() << "\n";
     Action action = cur_state->act(history, laser_characteristics, laser_analysis);
+    std::cout << "velocity: forward: " << action.get_velocity().get_forward() << "; yaw: " << action.get_velocity().get_yaw() << "\n";
 
     cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
     action = cur_state->act(history, laser_characteristics, laser_analysis);
+    std::cout << "velocity: forward: " << action.get_velocity().get_forward() << "; yaw: " << action.get_velocity().get_yaw() << "\n";
 
     cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
     action = cur_state->act(history, laser_characteristics, laser_analysis);
+    std::cout << "velocity: forward: " << action.get_velocity().get_forward() << "; yaw: " << action.get_velocity().get_yaw() << "\n";
 
     cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
     action = cur_state->act(history, laser_characteristics, laser_analysis);
+    std::cout << "velocity: forward: " << action.get_velocity().get_forward() << "; yaw: " << action.get_velocity().get_yaw() << "\n";
 
     cur_state = states.get_state(action.get_state());
     std::cout << "states.get_state() returned: " << cur_state->name() << "\n";
     action = cur_state->act(history, laser_characteristics, laser_analysis);
+    std::cout << "velocity: forward: " << action.get_velocity().get_forward() << "; yaw: " << action.get_velocity().get_yaw() << "\n";
   }
 };
 

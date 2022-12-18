@@ -56,8 +56,8 @@ private:
         if (laser_analysis.isInSight())
         {
           Velocity approach_velocity = velocity_calculator_.toApproach(*laser_characteristics_, laser_analysis);
-          RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.getForward(),
-                      approach_velocity.getYaw());
+          RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.get_forward(),
+                      approach_velocity.get_yaw());
             setVelocity(approach_velocity);
           if (laser_analysis.isNear())
           {
@@ -70,11 +70,11 @@ private:
           RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than %lf seconds", TIME_LOST_TOLERANCE_SECONDS);
           if (full_state_.wasObstacleLastSeenToRight())
           {
-              setVelocity(Velocity::createSearchSpinRight());
+              setVelocity(Velocity::create_spin_right());
           }
           else
           {
-              setVelocity(Velocity::createSearchSpinLeft());
+              setVelocity(Velocity::create_spin_left());
           }
         }
         else if (!full_state_.hasObstacleBeenSeen())
@@ -82,25 +82,25 @@ private:
           RCLCPP_WARN(logger_, "Obstacle has never been seen and is not within sight");
           if (full_state_.hasObstacleBeenSeen() && full_state_.wasObstacleLastSeenToRight())
           {
-              setVelocity(Velocity::createSearchSpinRight());
+              setVelocity(Velocity::create_spin_right());
           }
           else
           {
-              setVelocity(Velocity::createSearchSpinLeft());
+              setVelocity(Velocity::create_spin_left());
           }
         }
         break;
       case FsmState::OBSTACLE_NEAR:
         if (laser_analysis.isTooNear())
         {
-            setVelocity(Velocity::createReverse());
+            setVelocity(Velocity::create_reverse());
             setState(FsmState::OBSTACLE_TOO_NEAR);
         }
         else if (laser_analysis.isInSight())
         {
           Velocity parallel_velocity = velocity_calculator_.toParallel(laser_analysis);
-          RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallel_velocity.getForward(),
-                      parallel_velocity.getYaw());
+          RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallel_velocity.get_forward(),
+                      parallel_velocity.get_yaw());
             setVelocity(parallel_velocity);
         }
         else
@@ -114,7 +114,7 @@ private:
           else
           {
             RCLCPP_WARN(logger_, "Obstacle is not within sight");
-              setVelocity(Velocity::createStopped());
+              setVelocity(Velocity::create_stopped());
               setState(FsmState::SEARCH);
           }
         }
@@ -122,12 +122,12 @@ private:
       case FsmState::OBSTACLE_TOO_NEAR:
         if (getSecondsInState() > 2.0)
         {
-            setVelocity(Velocity::createStopped());
+            setVelocity(Velocity::create_stopped());
             setState(FsmState::SEARCH);
         }
         break;
       case FsmState::ERROR:
-          setVelocity(Velocity::createStopped());
+          setVelocity(Velocity::create_stopped());
         break;
     }
   }
@@ -162,15 +162,15 @@ private:
 
   void setVelocity(const Velocity& velocity)
   {
-    if ((abs(velocity.getForward()) > 5.0) || (abs(velocity.getYaw()) > 5.0))
+    if ((abs(velocity.get_forward()) > 5.0) || (abs(velocity.get_yaw()) > 5.0))
     {
-      RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.getForward(), velocity.getYaw());
+      RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
         setState(FsmState::ERROR);
       return;
     }
     geometry_msgs::msg::Twist drive_message;
-    drive_message.linear.x = velocity.getForward();
-    drive_message.angular.z = velocity.getYaw();
+    drive_message.linear.x = velocity.get_forward();
+    drive_message.angular.z = velocity.get_yaw();
     drive_publisher_->publish(drive_message);
   }
 

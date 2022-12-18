@@ -1,7 +1,3 @@
-//
-// Created by stevebillings on 11/21/22.
-//
-
 #ifndef OBSTACLE_HUGGER_VELOCITY_H
 #define OBSTACLE_HUGGER_VELOCITY_H
 
@@ -9,12 +5,12 @@ class Velocity
 {
 public:
   Velocity(double forward, double yaw);
-  static Velocity createStopped();
-  static Velocity createSearchSpinRight();
-  static Velocity createSearchSpinLeft();
-  static Velocity createReverse();
-  double getForward() const;
-  double getYaw() const;
+  static Velocity create_stopped();
+  static Velocity create_spin_right();
+  static Velocity create_spin_left();
+  static Velocity create_reverse();
+  double get_forward() const;
+  double get_yaw() const;
 
 private:
   double forward_;
