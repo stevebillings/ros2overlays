@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/laser/laser_analyzer.h"
+#include "../../src/laser/laser_analyzer.h"
 
 
 TEST(LaserTest, CharacteristicsTest) {

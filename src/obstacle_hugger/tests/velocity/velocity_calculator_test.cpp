@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/velocity/velocity_calculator.h"
+#include "../../src/velocity/velocity_calculator.h"
 
 TEST(VelocityCalculatorTest, AheadRight) {
   VelocityCalculator velocity_calculator;
