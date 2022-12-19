@@ -6,7 +6,7 @@ VelocityCalculator::VelocityCalculator()
 }
 
 Velocity VelocityCalculator::toApproach(const LaserCharacteristics& laser_characteristics,
-                                        const LaserAnalysis& laser_analysis)
+                                        const LaserAnalysis& laser_analysis) const
 {
   if (laser_analysis.isNear())
   {

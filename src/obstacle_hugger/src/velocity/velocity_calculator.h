@@ -11,7 +11,7 @@ class VelocityCalculator
 public:
   VelocityCalculator();
   Velocity toApproach(const LaserCharacteristics& laser_characteristics,
-                      const LaserAnalysis& laser_analysis);
+                      const LaserAnalysis& laser_analysis) const;
   Velocity toParallel(const LaserAnalysis& laser_analysis);
 private:
   double PARALLEL_X_VELOCITY = 1.5;
