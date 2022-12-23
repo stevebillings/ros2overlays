@@ -16,6 +16,9 @@ public:
   Action(const Velocity& velocity, const FsmState state)
   : velocity_(velocity)
   , state_(state) {};
+  Action(const FsmState state)
+      : velocity_(std::nullopt)
+      , state_(state) {};
   std::optional<Velocity> get_velocity() const;
   FsmState get_state() const;
 private:
