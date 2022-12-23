@@ -37,12 +37,15 @@ TEST(StateSearchTest, Near)
   history.set_time_lost(0.1l);
   Action action = state_search.act(history, laser_characteristics, laser_analysis);
   EXPECT_EQ(action.get_state(), FsmState::OBSTACLE_NEAR);
+  EXPECT_TRUE(action.get_velocity().has_value());
+  EXPECT_NEAR(action.get_velocity().value().get_forward(), 0.0l, 0.01L);
+  EXPECT_NEAR(action.get_velocity().value().get_yaw(), 0.0l, 0.01L);
 }
 
 TEST(StateSearchTest, TooNear)
 {
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
-  NearestSighting nearest_sighting = NearestSighting(1ul, 1.5l);
+  NearestSighting nearest_sighting = NearestSighting(1ul, 0.5l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, true, false, true, true, 1ul);
   StateSearch state_search = StateSearch();
   History history = History();
@@ -50,6 +53,9 @@ TEST(StateSearchTest, TooNear)
   history.set_time_lost(0.1l);
   Action action = state_search.act(history, laser_characteristics, laser_analysis);
   EXPECT_EQ(action.get_state(), FsmState::OBSTACLE_TOO_NEAR);
+  EXPECT_TRUE(action.get_velocity().has_value());
+  EXPECT_NEAR(action.get_velocity().value().get_forward(), 0.0l, 0.01L);
+  EXPECT_NEAR(action.get_velocity().value().get_yaw(), 0.0l, 0.01L);
 }
 
 TEST(StateSearchTest, LostSight)

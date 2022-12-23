@@ -11,7 +11,6 @@ Action StateSearch::act(const History& history, const LaserCharacteristics& lase
     return handleNeverSeen();
   else
     return handleRecentlyLost();
-  // TODO need to find all usages of Action and have them check .has_value() on velocity
 }
 
 const char* StateSearch::name() const {
