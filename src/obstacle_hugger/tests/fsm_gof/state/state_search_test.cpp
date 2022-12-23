@@ -18,10 +18,11 @@ TEST(StateSearchTest, InSightRight)
   history.set_time_lost(0.1l);
   Action action = state_search.act(history, laser_characteristics, laser_analysis);
   // Ensure the values are reasonable without being overly sensitive to tuning
-  EXPECT_TRUE(action.get_velocity().get_forward() > 0.5l);
-  EXPECT_TRUE(action.get_velocity().get_forward() < 5.0l);
-  EXPECT_TRUE(action.get_velocity().get_yaw() < 0.0l);
-  EXPECT_TRUE(action.get_velocity().get_yaw() > -0.1l);
+  EXPECT_TRUE(action.get_velocity().has_value());
+  EXPECT_TRUE(action.get_velocity().value().get_forward() > 0.5l);
+  EXPECT_TRUE(action.get_velocity().value().get_forward() < 5.0l);
+  EXPECT_TRUE(action.get_velocity().value().get_yaw() < 0.0l);
+  EXPECT_TRUE(action.get_velocity().value().get_yaw() > -0.1l);
 }
 
 TEST(StateSearchTest, LostSight)
@@ -35,7 +36,8 @@ TEST(StateSearchTest, LostSight)
   history.set_time_lost(5.0l);
   Action action = state_search.act(history, laser_characteristics, laser_analysis);
   // Ensure the values are reasonable without being overly sensitive to tuning
-  EXPECT_NEAR(action.get_velocity().get_forward(), 0.0l, 0.01L);
-  EXPECT_TRUE(action.get_velocity().get_yaw() < 0.0l);
-  EXPECT_TRUE(action.get_velocity().get_yaw() > -1.0l);
+  EXPECT_TRUE(action.get_velocity().has_value());
+  EXPECT_NEAR(action.get_velocity().value().get_forward(), 0.0l, 0.01L);
+  EXPECT_TRUE(action.get_velocity().value().get_yaw() < 0.0l);
+  EXPECT_TRUE(action.get_velocity().value().get_yaw() > -1.0l);
 }

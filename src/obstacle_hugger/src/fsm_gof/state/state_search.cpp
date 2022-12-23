@@ -6,19 +6,23 @@ Action StateSearch::act(const History& history, const LaserCharacteristics& lase
   Velocity new_velocity = Velocity::create_stopped();
   FsmState new_state = FsmState::SEARCH;
   if (laser_analysis.isInSight())
-  {
     return handleInSight(laser_characteristics, laser_analysis);
-  }
-  else if (history.has_obstacle_ever_been_seen() && !laser_analysis.isInSight()
-           && history.get_time_lost() > TIME_LOST_TOLERANCE_SECONDS)
-  {
+
+  else if (history.has_obstacle_ever_been_seen() && history.get_time_lost() > TIME_LOST_TOLERANCE_SECONDS)
     return handleLostSight(history);
-  }
+
   else if (!history.has_obstacle_ever_been_seen())
-  {
     return handleNeverSeen();
-  }
-  // TODO: what if it's none of these??
+
+  // TODO this is: only recently lost; need a way to return "no change"
+  // should we store the last action in history?
+  // add a boolean to action?
+  // subclass Action? Or Velocity?
+  // use null fields in Action object to signify no change? This actually seems problematic for doubles.
+  // for state, could add another enum value
+  // velocity could have a no change boolean
+  // In Action, make velocity std::optional<Velocity>
+  return Action(new_velocity, new_state);
 }
 
 const char* StateSearch::name() const {

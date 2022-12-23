@@ -1,7 +1,7 @@
 
 #include "action.h"
 
-Velocity Action::get_velocity() const
+std::optional<Velocity> Action::get_velocity() const
 {
   return velocity_;
 }
