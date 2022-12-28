@@ -50,6 +50,7 @@ set(dependencies
 )
 
 ament_target_dependencies(switch_fsm ${dependencies})
+ament_target_dependencies(gof_fsm ${dependencies})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -68,6 +69,10 @@ endif()
 install(TARGETS
   switch_fsm
   DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS
+        gof_fsm
+        DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(${dependencies})
 ament_package()
