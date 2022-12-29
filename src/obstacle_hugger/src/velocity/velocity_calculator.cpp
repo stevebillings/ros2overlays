@@ -28,7 +28,7 @@ Velocity VelocityCalculator::toApproach(const LaserCharacteristics& laser_charac
   }
   return Velocity(x, yaw);
 }
-Velocity VelocityCalculator::toParallel(const LaserAnalysis& laser_analysis)
+Velocity VelocityCalculator::toParallel(const LaserAnalysis& laser_analysis) const
 {
   double yaw;
   if (laser_analysis.isInSight())

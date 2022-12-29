@@ -5,8 +5,13 @@
 
 class StateNear : public State
 {
+public:
   Action act(const History& history, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const override;
   const char *name() const;
+private:
+  const Action handleTooNear() const;
+  const Action handleInSight(const LaserAnalysis& laser_analysis) const;
+  const Action handleLostSight(const History& history, const LaserAnalysis& laser_analysis) const;
 };
 
 
