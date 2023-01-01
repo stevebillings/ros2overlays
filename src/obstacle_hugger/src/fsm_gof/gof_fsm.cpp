@@ -2,7 +2,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-#include "states.h"
+#include "state_handlers.h"
 #include "../laser/laser_analyzer.h"
 
 using std::placeholders::_1;
@@ -17,7 +17,6 @@ public:
         "laser_scan", 10, std::bind(&GofObstacleHuggingNode::laserScanCallback, this, _1));
     timer_ = create_wall_timer(50ms, std::bind(&GofObstacleHuggingNode::controlCallback, this));
     drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-    //setState(FsmState::SEARCH);
   }
 private:
   void laserScanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
@@ -27,19 +26,22 @@ private:
 
   void controlCallback()
   {
-    RCLCPP_INFO(logger_, "FsmState: %s", cur_state_->name());
     if (last_laser_scan_msg_ == nullptr)
-      return;  // ain't seen nothin' yet
+    {
+      RCLCPP_INFO(logger_, "Haven't received a laser scan yet");
+      return;
+    }
 
+    RCLCPP_INFO(logger_, "FsmState: %s", cur_state_handler_->name());
     double current_time = now().seconds();
     init_laser_characteristics();
     LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
     update_history(laser_analysis);
 
-    Action action = cur_state_->act(history_, current_time, *laser_characteristics_, laser_analysis);
+    Action action = cur_state_handler_->act(history_, current_time, *laser_characteristics_, laser_analysis);
 
     history_.set_time_entered_state(action.get_state(), current_time);
-    cur_state_ = states_.get_state(action.get_state());
+    cur_state_handler_ = state_handlers_.get_state_handler(action.get_state());
     std::optional<Velocity> new_velocity = action.get_velocity();
     if (new_velocity.has_value())
       set_velocity(new_velocity.value());
@@ -72,7 +74,7 @@ private:
     if ((abs(velocity.get_forward()) > 5.0) || (abs(velocity.get_yaw()) > 5.0))
     {
       RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
-      cur_state_ = states_.get_state(FsmState::ERROR);
+      cur_state_handler_ = state_handlers_.get_state_handler(FsmState::ERROR);
       return;
     }
     geometry_msgs::msg::Twist drive_message;
@@ -95,13 +97,14 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
   sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
-  States states_ = States();
-  StateHandler* cur_state_ = states_.get_state(FsmState::SEARCH);
+  StateHandlers state_handlers_ = StateHandlers();
+  StateHandler* cur_state_handler_ = state_handlers_.get_state_handler(FsmState::SEARCH);
   LaserCharacteristics* laser_characteristics_ = nullptr;
   LaserAnalyzer laser_analyzer_;
   History history_;
   rclcpp::Logger logger_ = get_logger();
 };
+
 int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);

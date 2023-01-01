@@ -35,7 +35,7 @@ add_executable(gof_fsm
         src/laser/laser_analysis.cpp src/laser/laser_analysis.h
         src/obstacle/nearest_sighting.cpp src/obstacle/nearest_sighting.h
         src/fsm_gof/state/state_handler.h
-        src/fsm_gof/states.cpp src/fsm_gof/states.h
+        src/fsm_gof/state_handlers.cpp src/fsm_gof/state_handlers.h
         src/history/history.cpp src/history/history.h
         src/fsm_gof/state/state_handler_search.cpp src/fsm_gof/state/state_handler_search.h
         src/fsm_gof/state/state_handler_near.cpp src/fsm_gof/state/state_handler_near.h
