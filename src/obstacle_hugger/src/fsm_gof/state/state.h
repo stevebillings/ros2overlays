@@ -8,6 +8,8 @@
 #include "../action.h"
 #include "../../velocity/velocity_calculator.h"
 
+// TODO this is a state handler, not a state
+
 // the virtual class for State; each concrete state object implement the act() method for a specific state
 class State
 {

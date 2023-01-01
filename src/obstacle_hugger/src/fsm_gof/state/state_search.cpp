@@ -25,8 +25,7 @@ Action StateSearch::handleRecentlyLost() const
   return Action(FsmState::SEARCH);
 }
 
-Action
-StateSearch::handleInSight(const LaserCharacteristics &laser_characteristics, const LaserAnalysis &laser_analysis) const
+Action StateSearch::handleInSight(const LaserCharacteristics &laser_characteristics, const LaserAnalysis &laser_analysis) const
 {
   FsmState new_state = FsmState::SEARCH;
   Velocity new_velocity = velocity_calculator_.toApproach(laser_characteristics, laser_analysis);
