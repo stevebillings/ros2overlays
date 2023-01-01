@@ -7,20 +7,6 @@ TEST(StateNearTest, Name)
   EXPECT_STREQ("obstacle near", state_near.name());
 }
 
-TEST(StateNearTest, JustLostSight)
-{
-  LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
-  NearestSighting nearest_sighting = NearestSighting(1ul, 100.0l);
-  LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, false, false, false, true, 1ul);
-  StateNear state_near = StateNear();
-  History history = History();
-  history.set_obstacle_last_seen_time(0.0l, true);
-  history.set_time_lost(0.1l);
-  Action action = state_near.act(history, laser_characteristics, laser_analysis);
-  EXPECT_EQ(action.get_state(), FsmState::OBSTACLE_NEAR);
-  EXPECT_FALSE(action.get_velocity().has_value());
-}
-
 TEST(StateNearTest, InSightFarRight)
 {
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
@@ -68,6 +54,20 @@ TEST(StateNearTest, TooNear)
   EXPECT_TRUE(action.get_velocity().has_value());
   EXPECT_NEAR(action.get_velocity().value().get_forward(), -1.0l, 0.01L);
   EXPECT_NEAR(action.get_velocity().value().get_yaw(), 0.0l, 0.01L);
+}
+
+TEST(StateNearTest, JustLostSight)
+{
+  LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
+  NearestSighting nearest_sighting = NearestSighting(1ul, 100.0l);
+  LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, false, false, false, true, 1ul);
+  StateNear state_near = StateNear();
+  History history = History();
+  history.set_obstacle_last_seen_time(0.0l, true);
+  history.set_time_lost(0.1l);
+  Action action = state_near.act(history, laser_characteristics, laser_analysis);
+  EXPECT_EQ(action.get_state(), FsmState::OBSTACLE_NEAR);
+  EXPECT_FALSE(action.get_velocity().has_value());
 }
 
 TEST(StateNearTest, LostSightLongAgo)

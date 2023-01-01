@@ -34,12 +34,25 @@ private:
 
     init_laser_characteristics();
     LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
-    // const History& history, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis
+    update_history(laser_analysis);
+
     Action action = cur_state_->act(history_, *laser_characteristics_, laser_analysis);
+    
     cur_state_ = states_.get_state(action.get_state());
     std::optional<Velocity> new_velocity = action.get_velocity();
     if (new_velocity.has_value())
       set_velocity(new_velocity.value());
+  }
+
+  void update_history(const LaserAnalysis &laser_analysis)
+  {
+    if (laser_analysis.isInSight())
+    {
+      bool seenToRight = laser_analysis.isToRight();
+      history_.set_obstacle_last_seen_time(now().seconds(), seenToRight);
+    }
+    double time_lost = calculate_time_lost(laser_analysis);
+    history_.set_time_lost(time_lost);
   }
 
   void init_laser_characteristics()
@@ -65,6 +78,16 @@ private:
     drive_message.linear.x = velocity.get_forward();
     drive_message.angular.z = velocity.get_yaw();
     drive_publisher_->publish(drive_message);
+  }
+
+  double calculate_time_lost(const LaserAnalysis &laser_analysis) const
+  {
+    double time_lost = 0.0;
+    if (history_.has_obstacle_ever_been_seen() && !laser_analysis.isInSight())
+    {
+      time_lost = now().seconds() - history_.get_obstacle_last_seen_time();
+    }
+    return time_lost;
   }
 
   rclcpp::TimerBase::SharedPtr timer_;
