@@ -1,5 +1,19 @@
 #include "history.h"
 
+void History::set_time_entered_state(FsmState new_state, double current_time)
+{
+  if (!cur_state_.has_value() || (new_state != cur_state_.value()))
+  {
+    cur_state_ = new_state;
+    time_entered_state_ = current_time;
+  }
+}
+
+double History::get_time_entered_state() const
+{
+  return time_entered_state_;
+}
+
 void History::set_time_lost(double time_lost)
 {
   time_lost_ = time_lost;

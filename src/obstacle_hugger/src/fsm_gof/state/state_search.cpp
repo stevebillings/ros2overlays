@@ -2,7 +2,7 @@
 
 static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 
-Action StateSearch::act(const History &history, const LaserCharacteristics &laser_characteristics,
+Action StateSearch::act(const History &history, const double current_time, const LaserCharacteristics &laser_characteristics,
                         const LaserAnalysis &laser_analysis) const
 {
   if (laser_analysis.isInSight())

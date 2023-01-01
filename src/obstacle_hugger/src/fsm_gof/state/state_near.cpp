@@ -1,7 +1,7 @@
 
 #include "state_near.h"
 
-Action StateNear::act(const History &history, const LaserCharacteristics &laser_characteristics,
+Action StateNear::act(const History &history, const double current_time, const LaserCharacteristics &laser_characteristics,
                       const LaserAnalysis &laser_analysis) const
 {
   if (laser_analysis.isTooNear())

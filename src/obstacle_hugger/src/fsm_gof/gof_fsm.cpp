@@ -32,12 +32,14 @@ private:
     if (last_laser_scan_msg_ == nullptr)
       return;  // ain't seen nothin' yet
 
+    double current_time = now().seconds();
     init_laser_characteristics();
     LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
     update_history(laser_analysis);
 
-    Action action = cur_state_->act(history_, *laser_characteristics_, laser_analysis);
-    
+    Action action = cur_state_->act(history_, current_time, *laser_characteristics_, laser_analysis);
+
+    history_.set_time_entered_state(action.get_state(), current_time);
     cur_state_ = states_.get_state(action.get_state());
     std::optional<Velocity> new_velocity = action.get_velocity();
     if (new_velocity.has_value())
