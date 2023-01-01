@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include "../../../src/fsm_gof/state/state_near.h"
+#include "../../../src/fsm_gof/state/state_handler_near.h"
 
 TEST(StateNearTest, Name)
 {
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   EXPECT_STREQ("obstacle near", state_near.name());
 }
 
@@ -12,7 +12,7 @@ TEST(StateNearTest, InSightFarRight)
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
   NearestSighting nearest_sighting = NearestSighting(1ul, 4.0l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, true, false, false, true, 1ul);
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   History history = History();
   history.set_obstacle_last_seen_time(1000.0l, true);
   history.set_time_lost(0.1l);
@@ -29,7 +29,7 @@ TEST(StateNearTest, Near)
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
   NearestSighting nearest_sighting = NearestSighting(1ul, 1.5l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, true, true, false, true, 1ul);
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   History history = History();
   history.set_obstacle_last_seen_time(1000.0l, true);
   history.set_time_lost(0.1l);
@@ -45,7 +45,7 @@ TEST(StateNearTest, TooNear)
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
   NearestSighting nearest_sighting = NearestSighting(1ul, 0.5l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, true, false, true, true, 1ul);
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   History history = History();
   history.set_obstacle_last_seen_time(1000.0l, true);
   history.set_time_lost(0.1l);
@@ -61,7 +61,7 @@ TEST(StateNearTest, JustLostSight)
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
   NearestSighting nearest_sighting = NearestSighting(1ul, 100.0l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, false, false, false, true, 1ul);
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   History history = History();
   history.set_obstacle_last_seen_time(0.0l, true);
   history.set_time_lost(0.1l);
@@ -75,7 +75,7 @@ TEST(StateNearTest, LostSightLongAgo)
   LaserCharacteristics laser_characteristics = LaserCharacteristics(4ul, 2ul);
   NearestSighting nearest_sighting = NearestSighting(1ul, 20.0l);
   LaserAnalysis laser_analysis = LaserAnalysis(nearest_sighting, false, false, false, true, 1ul);
-  StateNear state_near = StateNear();
+  StateHandlerNear state_near = StateHandlerNear();
   History history = History();
   history.set_obstacle_last_seen_time(1000.0l, true);
   history.set_time_lost(5.0l);

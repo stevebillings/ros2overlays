@@ -1,9 +1,9 @@
-#ifndef OBSTACLE_HUGGER_STATE_NEAR_H
-#define OBSTACLE_HUGGER_STATE_NEAR_H
+#ifndef OBSTACLE_HUGGER_STATE_HANDLER_NEAR_H
+#define OBSTACLE_HUGGER_STATE_HANDLER_NEAR_H
 
-#include "state.h"
+#include "state_handler.h"
 
-class StateNear : public State
+class StateHandlerNear : public StateHandler
 {
 public:
   Action act(const History& history, const double current_time, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const override;
@@ -15,4 +15,4 @@ private:
 };
 
 
-#endif //OBSTACLE_HUGGER_STATE_NEAR_H
+#endif //OBSTACLE_HUGGER_STATE_HANDLER_NEAR_H

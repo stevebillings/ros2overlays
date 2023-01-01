@@ -1,10 +1,10 @@
 
-#ifndef OBSTACLE_HUGGER_STATE_SEARCH_H
-#define OBSTACLE_HUGGER_STATE_SEARCH_H
+#ifndef OBSTACLE_HUGGER_STATE_HANDLER_SEARCH_H
+#define OBSTACLE_HUGGER_STATE_HANDLER_SEARCH_H
 
-#include "state.h"
+#include "state_handler.h"
 
-class StateSearch : public State
+class StateHandlerSearch : public StateHandler
 {
 public:
   Action act(const History& history, const double current_time, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const override;
@@ -17,4 +17,4 @@ private:
 };
 
 
-#endif //OBSTACLE_HUGGER_STATE_SEARCH_H
+#endif //OBSTACLE_HUGGER_STATE_HANDLER_SEARCH_H

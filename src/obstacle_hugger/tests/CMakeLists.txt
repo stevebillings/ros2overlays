@@ -14,7 +14,7 @@ ament_add_gtest(velocity_calculator_test
         ../src/velocity/velocity_calculator.h ../src/velocity/velocity_calculator.cpp)
 ament_add_gtest(state_search_test
         fsm_gof/state/state_search_test.cpp
-        ../src/fsm_gof/state/state_search.cpp ../src/fsm_gof/state/state_search.h
+        ../src/fsm_gof/state/state_handler_search.cpp ../src/fsm_gof/state/state_handler_search.h
         ../src/history/history.cpp ../src/history/history.h
         ../src/laser/laser_characteristics.h ../src/laser/laser_characteristics.cpp
         ../src/laser/laser_analysis.h ../src/laser/laser_analysis.cpp
@@ -24,7 +24,7 @@ ament_add_gtest(state_search_test
         ../src/fsm_gof/action.cpp ../src/fsm_gof/action.h)
 ament_add_gtest(state_near_test
         fsm_gof/state/state_near_test.cpp
-        ../src/fsm_gof/state/state_near.cpp ../src/fsm_gof/state/state_near.h
+        ../src/fsm_gof/state/state_handler_near.cpp ../src/fsm_gof/state/state_handler_near.h
         ../src/history/history.cpp ../src/history/history.h
         ../src/laser/laser_characteristics.h ../src/laser/laser_characteristics.cpp
         ../src/laser/laser_analysis.h ../src/laser/laser_analysis.cpp

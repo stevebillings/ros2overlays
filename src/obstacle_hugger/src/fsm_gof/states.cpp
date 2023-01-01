@@ -4,7 +4,7 @@
 
 #include "states.h"
 
-State* States::get_state(FsmState state) const {
+StateHandler* States::get_state(FsmState state) const {
   switch (state) {
     case FsmState::SEARCH:
       return state_search_;

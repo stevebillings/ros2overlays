@@ -1,9 +1,9 @@
-#include "state_search.h"
+#include "state_handler_search.h"
 
 static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 
-Action StateSearch::act(const History &history, const double current_time, const LaserCharacteristics &laser_characteristics,
-                        const LaserAnalysis &laser_analysis) const
+Action StateHandlerSearch::act(const History &history, const double current_time, const LaserCharacteristics &laser_characteristics,
+                               const LaserAnalysis &laser_analysis) const
 {
   if (laser_analysis.isInSight())
     return handleInSight(laser_characteristics, laser_analysis);
@@ -15,17 +15,17 @@ Action StateSearch::act(const History &history, const double current_time, const
     return handleRecentlyLost();
 }
 
-const char *StateSearch::name() const
+const char *StateHandlerSearch::name() const
 {
   return "search";
 }
 
-Action StateSearch::handleRecentlyLost() const
+Action StateHandlerSearch::handleRecentlyLost() const
 {
   return Action(FsmState::SEARCH);
 }
 
-Action StateSearch::handleInSight(const LaserCharacteristics &laser_characteristics, const LaserAnalysis &laser_analysis) const
+Action StateHandlerSearch::handleInSight(const LaserCharacteristics &laser_characteristics, const LaserAnalysis &laser_analysis) const
 {
   FsmState new_state = FsmState::SEARCH;
   Velocity new_velocity = velocity_calculator_.toApproach(laser_characteristics, laser_analysis);
@@ -36,7 +36,7 @@ Action StateSearch::handleInSight(const LaserCharacteristics &laser_characterist
   return Action(new_velocity, new_state);
 }
 
-Action StateSearch::handleLostSight(const History &history) const
+Action StateHandlerSearch::handleLostSight(const History &history) const
 {
   Velocity new_velocity = Velocity::create_stopped();
   FsmState new_state = FsmState::SEARCH;
@@ -50,7 +50,7 @@ Action StateSearch::handleLostSight(const History &history) const
   return Action(new_velocity, new_state);
 }
 
-Action StateSearch::handleNeverSeen() const
+Action StateHandlerSearch::handleNeverSeen() const
 {
   Velocity new_velocity = Velocity::create_stopped();
   FsmState new_state = FsmState::SEARCH;

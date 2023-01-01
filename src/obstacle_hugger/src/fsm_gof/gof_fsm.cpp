@@ -27,8 +27,7 @@ private:
 
   void controlCallback()
   {
-    RCLCPP_INFO(logger_, "======================");
-    RCLCPP_INFO(logger_, "* FsmState: %s", cur_state_->name());
+    RCLCPP_INFO(logger_, "FsmState: %s", cur_state_->name());
     if (last_laser_scan_msg_ == nullptr)
       return;  // ain't seen nothin' yet
 
@@ -97,7 +96,7 @@ private:
   sensor_msgs::msg::LaserScan::SharedPtr last_laser_scan_msg_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr drive_publisher_;
   States states_ = States();
-  State* cur_state_ = states_.get_state(FsmState::SEARCH);
+  StateHandler* cur_state_ = states_.get_state(FsmState::SEARCH);
   LaserCharacteristics* laser_characteristics_ = nullptr;
   LaserAnalyzer laser_analyzer_;
   History history_;
