@@ -1,7 +1,6 @@
 #ifndef OBSTACLE_HUGGER_FSM_STATE_H
 #define OBSTACLE_HUGGER_FSM_STATE_H
 
-
 enum class FsmState
 {
   SEARCH,
@@ -10,4 +9,4 @@ enum class FsmState
   ERROR
 };
 
-#endif // OBSTACLE_HUGGER_FSM_STATE_H
+#endif  // OBSTACLE_HUGGER_FSM_STATE_H

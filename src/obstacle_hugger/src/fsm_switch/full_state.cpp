@@ -6,8 +6,7 @@ void FullState::setState(const FsmState& new_state, double state_start_time)
   fsm_state_ = new_state;
   state_start_time_ = state_start_time;
 }
-void FullState::setObstacleLastSeenTime(double obstacle_last_seen_time,
-                                        bool seen_to_right)
+void FullState::setObstacleLastSeenTime(double obstacle_last_seen_time, bool seen_to_right)
 {
   obstacle_has_been_seen_ = true;
   obstacle_last_seen_time_ = obstacle_last_seen_time;

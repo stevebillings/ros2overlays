@@ -34,7 +34,8 @@ unsigned long LaserAnalysis::getDeltaFromPerpendicular() const
   return delta_from_perpendicular_;
 }
 
-std::string LaserAnalysis::toString() const {
+std::string LaserAnalysis::toString() const
+{
   nearestSighting_.getRangeIndex();
   nearestSighting_.getRange();
   std::string description = "";

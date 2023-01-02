@@ -18,6 +18,7 @@ public:
     timer_ = create_wall_timer(50ms, std::bind(&GofObstacleHuggingNode::controlCallback, this));
     drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
   }
+
 private:
   void laserScanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
@@ -47,7 +48,7 @@ private:
       set_velocity(new_velocity.value());
   }
 
-  void update_history(const LaserAnalysis &laser_analysis)
+  void update_history(const LaserAnalysis& laser_analysis)
   {
     if (laser_analysis.isInSight())
     {
@@ -62,8 +63,8 @@ private:
   {
     if (laser_characteristics_ == nullptr)
     {
-      LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
-          last_laser_scan_msg_->ranges);
+      LaserCharacteristics laser_characteristics =
+          laser_analyzer_.determineCharacteristics(last_laser_scan_msg_->ranges);
       // Toss characteristics object onto heap so it sticks around for the life of the node
       laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
     }
@@ -83,7 +84,7 @@ private:
     drive_publisher_->publish(drive_message);
   }
 
-  double calculate_time_lost(const LaserAnalysis &laser_analysis) const
+  double calculate_time_lost(const LaserAnalysis& laser_analysis) const
   {
     double time_lost = 0.0;
     if (history_.has_obstacle_ever_been_seen() && !laser_analysis.isInSight())

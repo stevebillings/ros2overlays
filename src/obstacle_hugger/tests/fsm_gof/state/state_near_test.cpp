@@ -86,4 +86,3 @@ TEST(StateNearTest, LostSightLongAgo)
   EXPECT_NEAR(action.get_velocity().value().get_forward(), 0.0l, 0.01L);
   EXPECT_NEAR(action.get_velocity().value().get_yaw(), 0.0l, 0.01L);
 }
-

@@ -16,14 +16,12 @@ Velocity VelocityCalculator::toApproach(const LaserCharacteristics& laser_charac
   double yaw;
   if (laser_analysis.isToRight())
   {
-    long index_offset =
-            laser_characteristics.getStraightIndex() - laser_analysis.getNearestSighting().getRangeIndex();
+    long index_offset = laser_characteristics.getStraightIndex() - laser_analysis.getNearestSighting().getRangeIndex();
     yaw = (double)index_offset * DELTA_TO_YAW_MULTIPLIER * -1.0;
   }
   else
   {
-    long index_offset =
-            laser_analysis.getNearestSighting().getRangeIndex() - laser_characteristics.getStraightIndex();
+    long index_offset = laser_analysis.getNearestSighting().getRangeIndex() - laser_characteristics.getStraightIndex();
     yaw = (double)index_offset * DELTA_TO_YAW_MULTIPLIER;
   }
   return Velocity(x, yaw);

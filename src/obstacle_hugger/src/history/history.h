@@ -27,5 +27,4 @@ private:
   bool seen_to_right_ = false;
 };
 
-
-#endif //OBSTACLE_HUGGER_HISTORY_H
+#endif  // OBSTACLE_HUGGER_HISTORY_H

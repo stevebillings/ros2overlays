@@ -2,8 +2,9 @@
 
 static constexpr double TIME_LOST_TOLERANCE_SECONDS = 0.75;
 
-Action StateHandlerSearch::act(const History &history, const double current_time, const LaserCharacteristics &laser_characteristics,
-                               const LaserAnalysis &laser_analysis) const
+Action StateHandlerSearch::act(const History& history, const double current_time,
+                               const LaserCharacteristics& laser_characteristics,
+                               const LaserAnalysis& laser_analysis) const
 {
   if (laser_analysis.isInSight())
     return handleInSight(laser_characteristics, laser_analysis);
@@ -15,7 +16,7 @@ Action StateHandlerSearch::act(const History &history, const double current_time
     return handleRecentlyLost();
 }
 
-const char *StateHandlerSearch::name() const
+const char* StateHandlerSearch::name() const
 {
   return "search";
 }
@@ -25,7 +26,8 @@ Action StateHandlerSearch::handleRecentlyLost() const
   return Action(FsmState::SEARCH);
 }
 
-Action StateHandlerSearch::handleInSight(const LaserCharacteristics &laser_characteristics, const LaserAnalysis &laser_analysis) const
+Action StateHandlerSearch::handleInSight(const LaserCharacteristics& laser_characteristics,
+                                         const LaserAnalysis& laser_analysis) const
 {
   FsmState new_state = FsmState::SEARCH;
   Velocity new_velocity = velocity_calculator_.toApproach(laser_characteristics, laser_analysis);
@@ -36,14 +38,15 @@ Action StateHandlerSearch::handleInSight(const LaserCharacteristics &laser_chara
   return Action(new_velocity, new_state);
 }
 
-Action StateHandlerSearch::handleLostSight(const History &history) const
+Action StateHandlerSearch::handleLostSight(const History& history) const
 {
   Velocity new_velocity = Velocity::create_stopped();
   FsmState new_state = FsmState::SEARCH;
   if (history.was_seen_to_right())
   {
     new_velocity = Velocity::create_spin_right();
-  } else
+  }
+  else
   {
     new_velocity = Velocity::create_spin_left();
   }

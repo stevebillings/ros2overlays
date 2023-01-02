@@ -29,9 +29,12 @@ LaserAnalysis LaserAnalyzer::analyze(const LaserCharacteristics& laserCharacteri
 
   bool to_right = min_range_index < laserCharacteristics.getStraightIndex();
   unsigned long delta_from_perpendicular = 0L;
-  if (to_right) {
+  if (to_right)
+  {
     delta_from_perpendicular = min_range_index;
-  } else {
+  }
+  else
+  {
     delta_from_perpendicular = laserCharacteristics.getLeftmostIndex() - min_range_index;
   }
   // TODO how does this memory get freed?

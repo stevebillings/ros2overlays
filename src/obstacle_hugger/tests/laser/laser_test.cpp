@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "../../src/laser/laser_analyzer.h"
 
-
-TEST(LaserTest, CharacteristicsTest) {
+TEST(LaserTest, CharacteristicsTest)
+{
   LaserAnalyzer laserAnalyzer;
   std::vector<float> laser_ranges;
   laser_ranges.push_back(10.0);
@@ -16,7 +16,8 @@ TEST(LaserTest, CharacteristicsTest) {
   EXPECT_EQ(laser_characteristics.getStraightIndex(), 2ul);
 }
 
-TEST(LaserTest, AnalysisTest) {
+TEST(LaserTest, AnalysisTest)
+{
   LaserAnalyzer laserAnalyzer;
   std::vector<float> laser_ranges;
   laser_ranges.push_back(10.0);
@@ -33,12 +34,12 @@ TEST(LaserTest, AnalysisTest) {
   EXPECT_EQ(nearest_sighting.getRange(), 1.5);
   EXPECT_TRUE(laser_analysis.isNear());
   EXPECT_FALSE(laser_analysis.isTooNear());
-  //EXPECT_TRUE(laser_analysis.isToRight());
+  // EXPECT_TRUE(laser_analysis.isToRight());
   EXPECT_EQ(laser_analysis.getDeltaFromPerpendicular(), 2ul);
 }
 
-
-TEST(LaserTest, AnalysisSideTest) {
+TEST(LaserTest, AnalysisSideTest)
+{
   LaserAnalyzer laserAnalyzer;
   std::vector<float> laser_ranges;
   laser_ranges.push_back(3.0);
@@ -59,7 +60,8 @@ TEST(LaserTest, AnalysisSideTest) {
   EXPECT_EQ(laser_analysis.getDeltaFromPerpendicular(), 1ul);
 }
 
-TEST(LaserTest, AnalysisTooNearTest) {
+TEST(LaserTest, AnalysisTooNearTest)
+{
   LaserAnalyzer laserAnalyzer;
   std::vector<float> laser_ranges;
   laser_ranges.push_back(3.0);

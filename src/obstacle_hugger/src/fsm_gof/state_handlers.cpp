@@ -4,8 +4,10 @@
 
 #include "state_handlers.h"
 
-StateHandler* StateHandlers::get_state_handler(FsmState state) const {
-  switch (state) {
+StateHandler* StateHandlers::get_state_handler(FsmState state) const
+{
+  switch (state)
+  {
     case FsmState::SEARCH:
       return state_handler_search_;
     case FsmState::OBSTACLE_NEAR:

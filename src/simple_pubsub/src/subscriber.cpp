@@ -3,22 +3,25 @@
 
 using std::placeholders::_1;
 
-class SubscriberNode : public rclcpp::Node {
-	public:
-		SubscriberNode() : Node("subscriber_node") {
-			subscriber_ = create_subscription<std_msgs::msg::Int32>("sb_int_topic", 10,
-					std::bind(&SubscriberNode::callback, this, _1));
-		}
+class SubscriberNode : public rclcpp::Node
+{
+public:
+  SubscriberNode() : Node("subscriber_node")
+  {
+    subscriber_ =
+        create_subscription<std_msgs::msg::Int32>("sb_int_topic", 10, std::bind(&SubscriberNode::callback, this, _1));
+  }
 
-		void callback(const std_msgs::msg::Int32::SharedPtr msg) {
-			RCLCPP_INFO(get_logger(), "Hello %d", msg->data);
-		}
+  void callback(const std_msgs::msg::Int32::SharedPtr msg)
+  {
+    RCLCPP_INFO(get_logger(), "Hello %d", msg->data);
+  }
 
-	private:
-		rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscriber_;
+private:
+  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscriber_;
 };
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);
 

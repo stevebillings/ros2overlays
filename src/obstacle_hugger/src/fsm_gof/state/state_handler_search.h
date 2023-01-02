@@ -7,8 +7,10 @@
 class StateHandlerSearch : public StateHandler
 {
 public:
-  Action act(const History& history, const double current_time, const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const override;
-  const char *name() const;
+  Action act(const History& history, const double current_time, const LaserCharacteristics& laser_characteristics,
+             const LaserAnalysis& laser_analysis) const override;
+  const char* name() const;
+
 private:
   Action handleInSight(const LaserCharacteristics& laser_characteristics, const LaserAnalysis& laser_analysis) const;
   Action handleLostSight(const History& history) const;
@@ -16,5 +18,4 @@ private:
   Action handleRecentlyLost() const;
 };
 
-
-#endif //OBSTACLE_HUGGER_STATE_HANDLER_SEARCH_H
+#endif  // OBSTACLE_HUGGER_STATE_HANDLER_SEARCH_H

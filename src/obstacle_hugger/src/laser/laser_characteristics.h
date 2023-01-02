@@ -11,8 +11,7 @@ public:
   LaserCharacteristics(const unsigned long leftmost_index, const unsigned long straight_index)
     : leftmost_index_(leftmost_index), straight_index_(straight_index){};
   LaserCharacteristics(const LaserCharacteristics& other)
-  : leftmost_index_(other.leftmost_index_)
-  , straight_index_(other.straight_index_){};
+    : leftmost_index_(other.leftmost_index_), straight_index_(other.straight_index_){};
   unsigned long getLeftmostIndex() const;
   unsigned long getStraightIndex() const;
 

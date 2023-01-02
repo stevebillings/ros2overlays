@@ -18,7 +18,7 @@ public:
         "laser_scan", 10, std::bind(&ObstacleHuggingNode::laserScanCallback, this, _1));
     timer_ = create_wall_timer(50ms, std::bind(&ObstacleHuggingNode::controlCallback, this));
     drive_publisher_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-      setState(FsmState::SEARCH);
+    setState(FsmState::SEARCH);
   }
 
 private:
@@ -37,8 +37,8 @@ private:
     init_laser_characteristics();
     LaserAnalysis laser_analysis = laser_analyzer_.analyze(*laser_characteristics_, last_laser_scan_msg_->ranges);
 
-    // TODO: These to data points are new observations; maybe pass them and laser characteristics + analysis to state.act(observations)
-    // They are both time-related; time since X. ***history***
+    // TODO: These to data points are new observations; maybe pass them and laser characteristics + analysis to
+    // state.act(observations) They are both time-related; time since X. ***history***
     // TODO should time_lost be stored in state? Not sure new info belongs in state
     if (laser_analysis.isInSight())
     {
@@ -58,23 +58,24 @@ private:
           Velocity approach_velocity = velocity_calculator_.toApproach(*laser_characteristics_, laser_analysis);
           RCLCPP_INFO(logger_, "Approaching: x: %lf; yaw: %lf", approach_velocity.get_forward(),
                       approach_velocity.get_yaw());
-            setVelocity(approach_velocity);
+          setVelocity(approach_velocity);
           if (laser_analysis.isNear())
           {
-              setState(FsmState::OBSTACLE_NEAR);
+            setState(FsmState::OBSTACLE_NEAR);
           }
         }
-        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight()
-          && history_.get_time_lost() > TIME_LOST_TOLERANCE_SECONDS)
+        else if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight() &&
+                 history_.get_time_lost() > TIME_LOST_TOLERANCE_SECONDS)
         {
-          RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than %lf seconds", TIME_LOST_TOLERANCE_SECONDS);
+          RCLCPP_WARN(logger_, "We've lost track of the obstacle for more than %lf seconds",
+                      TIME_LOST_TOLERANCE_SECONDS);
           if (full_state_.wasObstacleLastSeenToRight())
           {
-              setVelocity(Velocity::create_spin_right());
+            setVelocity(Velocity::create_spin_right());
           }
           else
           {
-              setVelocity(Velocity::create_spin_left());
+            setVelocity(Velocity::create_spin_left());
           }
         }
         else if (!full_state_.hasObstacleBeenSeen())
@@ -82,26 +83,26 @@ private:
           RCLCPP_WARN(logger_, "Obstacle has never been seen and is not within sight");
           if (full_state_.hasObstacleBeenSeen() && full_state_.wasObstacleLastSeenToRight())
           {
-              setVelocity(Velocity::create_spin_right());
+            setVelocity(Velocity::create_spin_right());
           }
           else
           {
-              setVelocity(Velocity::create_spin_left());
+            setVelocity(Velocity::create_spin_left());
           }
         }
         break;
       case FsmState::OBSTACLE_NEAR:
         if (laser_analysis.isTooNear())
         {
-            setVelocity(Velocity::create_reverse());
-            setState(FsmState::OBSTACLE_TOO_NEAR);
+          setVelocity(Velocity::create_reverse());
+          setState(FsmState::OBSTACLE_TOO_NEAR);
         }
         else if (laser_analysis.isInSight())
         {
           Velocity parallel_velocity = velocity_calculator_.toParallel(laser_analysis);
           RCLCPP_INFO(logger_, "Paralleling: x: %lf; yaw: %lf", parallel_velocity.get_forward(),
                       parallel_velocity.get_yaw());
-            setVelocity(parallel_velocity);
+          setVelocity(parallel_velocity);
         }
         else
         {
@@ -114,25 +115,25 @@ private:
           else
           {
             RCLCPP_WARN(logger_, "Obstacle is not within sight");
-              setVelocity(Velocity::create_stopped());
-              setState(FsmState::SEARCH);
+            setVelocity(Velocity::create_stopped());
+            setState(FsmState::SEARCH);
           }
         }
         break;
       case FsmState::OBSTACLE_TOO_NEAR:
         if (getSecondsInState() > 2.0)
         {
-            setVelocity(Velocity::create_stopped());
-            setState(FsmState::SEARCH);
+          setVelocity(Velocity::create_stopped());
+          setState(FsmState::SEARCH);
         }
         break;
       case FsmState::ERROR:
-          setVelocity(Velocity::create_stopped());
+        setVelocity(Velocity::create_stopped());
         break;
     }
   }
 
-  double calculate_time_lost(const LaserAnalysis &laser_analysis) const
+  double calculate_time_lost(const LaserAnalysis& laser_analysis) const
   {
     double time_lost = 0.0;
     if (full_state_.hasObstacleBeenSeen() && !laser_analysis.isInSight())
@@ -146,8 +147,8 @@ private:
   {
     if (laser_characteristics_ == nullptr)
     {
-      LaserCharacteristics laser_characteristics = laser_analyzer_.determineCharacteristics(
-          last_laser_scan_msg_->ranges);
+      LaserCharacteristics laser_characteristics =
+          laser_analyzer_.determineCharacteristics(last_laser_scan_msg_->ranges);
       // Toss characteristics object onto heap so it sticks around for the life of the node
       laser_characteristics_ = new LaserCharacteristics(laser_characteristics);
     }
@@ -165,7 +166,7 @@ private:
     if ((abs(velocity.get_forward()) > 5.0) || (abs(velocity.get_yaw()) > 5.0))
     {
       RCLCPP_ERROR(logger_, "Invalid velocity: x: %lf, yaw: %lf", velocity.get_forward(), velocity.get_yaw());
-        setState(FsmState::ERROR);
+      setState(FsmState::ERROR);
       return;
     }
     geometry_msgs::msg::Twist drive_message;
@@ -176,7 +177,7 @@ private:
 
   void setState(const FsmState& new_state)
   {
-      full_state_.setState(new_state, now().seconds());
+    full_state_.setState(new_state, now().seconds());
     RCLCPP_INFO(logger_, "New FsmState: %s", full_state_.getFsmStateName());
   }
 
