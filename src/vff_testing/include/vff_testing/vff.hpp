@@ -3,5 +3,5 @@
 
 class Vff {
 public:
-  [[nodiscard]] std::vector<float> getVff(double laser_angle_min, double laser_angle_increment, std::vector<float>  const & laser_ranges) const;
+  [[nodiscard]] std::vector<float> getVffResult(double laser_angle_min, double laser_angle_increment, std::vector<float>  const & laser_ranges) const;
 };

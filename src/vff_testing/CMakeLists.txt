@@ -18,7 +18,7 @@ find_package(std_msgs REQUIRED)
 include_directories(include)
 
 add_executable(vff_test
-        src/vff_test.cpp
+        src/vff_main.cpp
         src/vff.cpp
         include/vff_testing/vff.hpp)
 

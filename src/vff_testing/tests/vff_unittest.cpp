@@ -12,7 +12,7 @@ TEST(VFF_UNITTEST, FAR) {
   }
 
   auto vff = Vff();
-  std::vector<float> result = vff.getVff(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
+  std::vector<float> result = vff.getVffResult(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
 
   ASSERT_EQ(result.size(), 2ul);
   ASSERT_NEAR(result[0], 1.0, 0.01);
@@ -27,7 +27,7 @@ TEST(VFF_UNITTEST, AHEAD_CLOSE) {
   laser_ranges[319] = 0.5;
 
   auto vff = Vff();
-  std::vector<float> result = vff.getVff(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
+  std::vector<float> result = vff.getVffResult(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
 
   ASSERT_EQ(result.size(), 2ul);
   ASSERT_NEAR(result[0], 0.5, 0.1);
@@ -42,7 +42,7 @@ TEST(VFF_UNITTEST, RIGHT_CLOSE) {
   laser_ranges[159] = 0.1;
 
   auto vff = Vff();
-  std::vector<float> result = vff.getVff(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
+  std::vector<float> result = vff.getVffResult(LASER_ANGLE_MINIMUM, LASER_ANGLE_INCREMENT, laser_ranges);
 
   ASSERT_EQ(result.size(), 2ul);
   ASSERT_NEAR(result[0], 0.3, 0.1);

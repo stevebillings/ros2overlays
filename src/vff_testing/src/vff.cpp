@@ -1,6 +1,6 @@
 #include "vff_testing/vff.hpp"
 
-[[nodiscard]] std::vector<float> Vff::getVff(double laser_angle_min, double laser_angle_increment, std::vector<float>  const & laser_ranges) const {
+[[nodiscard]] std::vector<float> Vff::getVffResult(double laser_angle_min, double laser_angle_increment, std::vector<float>  const & laser_ranges) const {
   const float MINIMUM_IGNORABLE_DISTANCE = 1.0;
   std::vector<float> attractive_vector = {MINIMUM_IGNORABLE_DISTANCE, 0.0}; // Goal: go forward
   std::vector<float> repulsive_vector = {0.0, 0.0};
