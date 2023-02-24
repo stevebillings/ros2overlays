@@ -410,7 +410,7 @@
                 <collision name='collision'> <!--todo: describe why we need the collision-->
                     <geometry>
                         <box>
-                            <size>0.5 5.0 2.0</size>
+                            <size>0.5 20.0 2.0</size>
                         </box>
                     </geometry>
                 </collision>
@@ -464,7 +464,7 @@
                 <collision name='collision'> <!--todo: describe why we need the collision-->
                     <geometry>
                         <box>
-                            <size>0.5 5.0 2.0</size>
+                            <size>0.5 20.0 2.0</size>
                         </box>
                     </geometry>
                 </collision>
@@ -518,7 +518,7 @@
                 <collision name='collision'> <!--todo: describe why we need the collision-->
                     <geometry>
                         <box>
-                            <size>0.5 5.0 2.0</size>
+                            <size>18.0 0.5 2.0</size>
                         </box>
                     </geometry>
                 </collision>
@@ -572,7 +572,7 @@
                 <collision name='collision'> <!--todo: describe why we need the collision-->
                     <geometry>
                         <box>
-                            <size>0.5 5.0 2.0</size>
+                            <size>18.0 0.5 2.0</size>
                         </box>
                     </geometry>
                 </collision>
@@ -591,6 +591,46 @@
             </plugin>
         </model>
         <!-- end right wall -->
+
+    <!-- obstacle cylinder -->
+    <model name="cylinder">
+      <pose>0 -1.5 0.5 0 0 0</pose>
+      <link name="cylinder_link">
+        <inertial>
+          <inertia>
+            <ixx>0.1458</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1458</iyy>
+            <iyz>0</iyz>
+            <izz>0.125</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="cylinder_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="cylinder_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>
+            <diffuse>0 1 0 1</diffuse>
+            <specular>0 1 0 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
 
         <!-- Moving Forward-->
         <plugin filename="ignition-gazebo-triggered-publisher-system"
